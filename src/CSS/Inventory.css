@@ -1,0 +1,36 @@
+.nav-pills .nav-link {
+    padding: 2e,m;
+    border-radius: 0;
+    background-color: #B2D8D8;
+    color: white;
+    padding-top: 3em;
+    padding-bottom: 3em;
+    padding-left: 0;
+    padding-right: 0;
+    text-align: center;
+  }
+
+  .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    color: white;
+    background-color: teal;
+    text-align: center;
+  }
+  
+  .col-sm-3 {
+    flex: 0 0 10%;
+    max-width: 10%;
+    padding: 0;
+    background-color:  #B2D8D8;
+  }
+  
+  .col-sm-9 {
+    background-color: white;
+    flex: 0 0 90%;
+    max-width: 90%;
+    padding: 0;
+    min-height: 90vh;
+  }
+
+  div.row{
+      margin:0;
+  }

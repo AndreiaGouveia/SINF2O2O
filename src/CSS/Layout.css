@@ -1,0 +1,36 @@
+.fixedBottom {
+    background-color: black;
+    color: white;
+}
+
+.pt-3, .py-3{
+    background: black;
+    color: white;
+    font-weight: bold;
+}
+
+.navbar{
+    background-color:teal;
+    color: white;
+}
+
+.navbar-light .navbar-nav .nav-link{
+    color: white;
+}
+
+.navbar-light .navbar-brand{
+    color: white;
+    font-weight: bold;
+}
+
+a#basic-nav-dropdown.dropdown-toggle.nav-link{
+    border-radius: 5%;
+    background-color: white;
+    color: teal;
+    font-weight: bold;
+}
+
+.dropdown-menu {
+    right: 0;
+    left: auto;
+}

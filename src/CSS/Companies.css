@@ -1,0 +1,59 @@
+#Companies {
+    margin-top: 2em;
+}
+
+h1 {
+    text-align: center;
+    color: cornflowerblue;
+    font-weight: bold;
+}
+
+#Company-Card {
+    background-color: grey;
+    border-radius: 5%;
+    height: 400px;
+    width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
+}
+
+#Company-Card div:first-child {
+    background-color: white;
+    margin-top: 40px;
+    margin-bottom: 0px;
+    margin-right: 50px;
+    margin-left: 50px;
+
+    border-radius: 20px;
+    height: 90px;
+    display: flex;
+    justify-content: center; 
+    position: relative;
+}
+
+#Company-Card div:first-child h1 {
+    color: black;
+    font-size: large;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+}
+
+#Company-Card img {
+    width: 30%;
+    height: 35%;
+    display: block;
+    margin: auto;
+}
+
+#ButtonRow {
+    margin: 30px 20px;
+    height: 30px;
+}
+
+#ButtonRow button {
+    border-radius: 10px;
+}

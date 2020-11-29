@@ -1,0 +1,43 @@
+.banner{
+    min-height: 60vh;
+    background:linear-gradient(rgba(0, 128, 128, 1),transparent);
+    background-color:white /*this your primary color*/;
+    /*color : #003D42;*/
+    color: white;
+    font-size: 12em;
+    
+}
+
+.center {
+    margin: 0;
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+.h1, h1{
+    font-size: 9rem;
+    font-weight: bolder;
+}
+
+.functionalities{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    padding-top: 49vh;
+}
+
+.func{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: whitesmoke;
+}
+
+.func h2{
+    padding: 1.5em;
+    color: teal;
+    font-weight: bold;
+}

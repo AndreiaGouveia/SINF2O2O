@@ -2,12 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import Layout from './Components/Layout';
-import reportWebVitals from './reportWebVitals';
 import MainPage from './Pages/MainPage'
 import Companies from './Pages/Companies'
 import Transactions from './Pages/Transactions'
 import Inventory from './Pages/Inventory'
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 ReactDOM.render(
   <React.StrictMode>
     <Router>

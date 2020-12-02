@@ -1,4 +1,5 @@
-#! /bin/sh
-
+cd fe 
 npm install
-npm start
+cd ../be
+npm install
+npm run dev

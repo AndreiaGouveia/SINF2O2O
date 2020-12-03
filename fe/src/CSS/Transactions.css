@@ -17,13 +17,13 @@
 .MuiAccordionDetails-root {
     display: flex;
     flex-direction: column !important;
-    background-color: #33adff;
+    background-color: #008ae6;
     border-radius: 10px;
    
 }
 
 .MuiAccordionSummary-expandIcon:hover {
-    background-color: #33adff !important;
+    background-color: #008ae6 !important;
     
 }
 
@@ -60,7 +60,7 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    background-color: #33adff;
+    background-color: #008ae6;
     padding: 1rem 2rem;
     font-size: 2rem;
     line-height: 1.5;
@@ -74,7 +74,7 @@
 }
 
 #addButton{
-    background-color: rgba(226, 226, 14, 0.993);
+    background-color: rgb(236, 220, 76);
     color: white;
     font-size: 50px;
     text-align: center;

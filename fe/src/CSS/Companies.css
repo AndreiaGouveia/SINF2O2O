@@ -2,7 +2,8 @@
     margin-top: 2em;
 }
 
-h1 {
+#Companies h1 {
+    font-size: 3rem;
     text-align: center;
     color: cornflowerblue;
     font-weight: bold;
@@ -10,7 +11,7 @@ h1 {
 
 #Company-Card {
     background-color: grey;
-    border-radius: 5%;
+    border-radius: 15px;
     height: 400px;
     width: 480px;
     margin-left: auto;
@@ -25,7 +26,7 @@ h1 {
     margin-right: 50px;
     margin-left: 50px;
 
-    border-radius: 20px;
+    border-radius: 15px;
     height: 90px;
     display: flex;
     justify-content: center; 
@@ -54,6 +55,22 @@ h1 {
     height: 30px;
 }
 
-#ButtonRow button {
-    border-radius: 10px;
+#ButtonRow .btn {
+    border-radius: 15px;
+    margin-right: 10px;
 }
+
+#Company-Card div.card-body{
+    margin: 40px 50px;
+}
+
+#Company-Card form {
+    margin: 0;
+}
+
+#Company-Card form input {
+    background-color: lightskyblue;
+    border-radius: 15px;
+    padding-left: 10px;
+}
+

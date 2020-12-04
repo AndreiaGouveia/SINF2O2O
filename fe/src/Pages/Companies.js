@@ -11,11 +11,11 @@ function Companies () {
     return (
         <div id="Companies">
             <Row className="justify-content-around">
-                <Col><h1>Company 1</h1>{CompanyDisplay("SINF")}</Col>
-                <Col><h1>Company 2</h1>{CompanyDisplay("DIFFER")}</Col>
+                <Col id="Company1"><h1>Company 1</h1>{CompanyDisplay("SINF")}</Col>
+                <Col id="Company2"><h1>Company 2</h1>{CompanyDisplay("DIFFER")}</Col>
             </Row>
             <Row id="ButtonRow" className="justify-content-end">
-                <Button variant="primary">
+                <Button variant="primary" href="/edit-companies">
                     Edit Companies
                 </Button>
             </Row>
@@ -27,7 +27,6 @@ function Companies () {
 function CompanyDisplay (name) {
     
       return (
-          //<h1>Company {name}</h1>
           <Card id="Company-Card">
               <Card.Title>
                   <h1>{name}</h1>

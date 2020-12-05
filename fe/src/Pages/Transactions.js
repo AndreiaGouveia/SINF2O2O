@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-class Transactions extends Component () {
+class Transactions extends Component{
 
 
     render(){

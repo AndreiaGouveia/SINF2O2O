@@ -91,12 +91,12 @@ async function getSalesProducts(result,res){
           .catch(error => {
             res.status(400).json({success: false, error: error});
               //console.log(error);
-              //token might have expired or might not even exist
-              /*console.log("will try token");
+              //token might have expired or might not even exist so get new token and try again!
+              console.log("will try token");
               getToken(result).then(response => {
                 result.token =response;
                 getSalesProducts(result , res);
-              });*/
+              });
 
           });
 

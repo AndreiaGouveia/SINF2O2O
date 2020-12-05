@@ -3,11 +3,10 @@ const tenant_sinf = process.env.TENANT_SINF;
 const token_differ = "243034-0001/"; 
 const token_sinf = process.env.SINF; 
 const url = "https://my.jasminsoftware.com/api/";
-const fetch = require("node-fetch");
-const { response } = require("../server");
 var FormData = require("form-data");
-const { urlencoded } = require("express");
+const { urlencoded, response } = require("express");
 const axios = require("axios");
+const db = require("../database/database");
 
 
 exports.get_companies_products = async function getCompanieProducts(req, res, next){
@@ -20,18 +19,37 @@ exports.get_companies_products = async function getCompanieProducts(req, res, ne
 
     if(req.params.id == 0) //DIFFER
     {
-        //get token!!
+        console.log(db)
+        let result = {};
+        db.all("SELECT * from company where id=0", function(err,rows){
+            if(err)
+            console.log(err);
+            else
+            rows.forEach(function (row) {
+              console.log("i am gehre")
+                result = row;
+                getSalesProducts(result , res);
+          }); 
+        }); 
+
+        
+    }else{ //SINF
+
+    }
+}
+
+async function getToken(result,res){
+//get token!!
         const form = new FormData();
-        form.append("grant_type", "client_credentials");
-        form.append("client_id", "DIFFER");
-        form.append("client_secret", "0766a6e0-8bff-4c08-8ce0-615c2fed2668");
-        form.append("scope", "application");
+        form.append("grant_type", result.grant_type);
+        form.append("client_id", result.client_id);
+        form.append("client_secret", result.client_secret);
+        form.append("scope", result.scope);
 
         const requestOptions = {
             method: 'POST',
             body : form
         };
-        console.log(form.getHeaders());
 
         try {
             const response = await axios.post(
@@ -39,28 +57,29 @@ exports.get_companies_products = async function getCompanieProducts(req, res, ne
               form,
               { headers: { ...form.getHeaders() } }
             );
-            console.log("here");
             const { data } = response;
-            console.log("here2");
             if (response.status !== 200) {
               return Promise.reject(data);
             }
-            console.log(data)
-            getSalesProducts(data.access_token,res)
+            let params = [data.access_token , 0];
+            db.run("UPDATE company SET token = $1 where id = $2", params, function(err){
+              if(err){
+                console.log(err);
+              }
+              console.log("I have updated")
+            });
+            return data.access_token;
           } catch (error) {
-            res.status(400).json({success: false, error: error});
+            return error;
           }
+          console.log("livin ma life")
 
-    }else{ //SINF
-
-    }
 }
 
-async function getSalesProducts(token,res){
-    console.log(token);
-    console.log(url);
+async function getSalesProducts(result,res){
+  let token = result.token;
     axios
-          .get(url + tenant_differ + token_differ + "salescore/salesitems", {
+          .get(url  + tenant_differ +  token_differ + "salescore/salesitems", {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "x-www-form-urlencoded"
@@ -71,7 +90,26 @@ async function getSalesProducts(token,res){
           })
           .catch(error => {
               console.log(error);
-              res.status(400).json({ success: false, error: "error getting Sales Items" });
+              //token might have expired or might not even exist
+              getToken(result).then(response => {
+                result.token =response;
+                getSalesProducts(result , res);
+              });
+              //res.status(400).json({ success: false, error: "error getting Sales Items" });
           });
 
 }
+
+exports.test = async function test(req, res, next){
+  console.log("iam the test bae");
+  console.log(db)
+  db.all("SELECT * from company", function(err,rows){
+      if(err)
+      console.log(err);
+      else
+      rows.forEach(function (row) {
+          console.log("im a row") 
+          console.log(row);
+    }); 
+  }); 
+} 

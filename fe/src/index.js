@@ -7,6 +7,7 @@ import Companies from './Pages/Companies'
 import Transactions from './Pages/Transactions'
 import Inventory from './Pages/Inventory'
 import { BrowserRouter as Router, Route } from 'react-router-dom';
+import EditCompanies from './Components/EditCompanies';
 ReactDOM.render(
   <React.StrictMode>
     <Router>
@@ -16,6 +17,7 @@ ReactDOM.render(
         <Route path ="/companies" exact component={Companies} />
         <Route path ="/transactions" exact component={Transactions} />
         <Route path ="/inventory" exact component={Inventory} />
+        <Route path ="/edit-companies" exact component={EditCompanies} />
         </>
       </Layout>
     </Router>

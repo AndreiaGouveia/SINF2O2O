@@ -1,15 +1,15 @@
-import React from 'react';
+import React, {Component} from 'react';
 
-function Transactions () {
+class Transactions extends Component{
 
 
-
+    render(){
     return (
         <>
             <h1>Transactions page</h1>
             <h2>To do....</h2>
         </>
-    );
+    );}
 }
 
 export default Transactions;

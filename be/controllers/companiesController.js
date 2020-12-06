@@ -9,7 +9,7 @@ const axios = require("axios");
 const db = require("../database/database");
 
 
-exports.get_companies_products = async function getCompanieProducts(req, res, next){
+exports.get_companies_products = async function getCompanyProducts(req, res, next){
 
 
     if(req.params.id != 0 && req.params.id != 1){
@@ -30,6 +30,29 @@ exports.get_companies_products = async function getCompanieProducts(req, res, ne
           getSalesProducts(result , res);
         }); 
       }); 
+}
+
+exports.get_companies_purchased_products = async function getCompanyPurchasedProducts(req, res, next){
+
+
+  if(req.params.id != 0 && req.params.id != 1){
+      res.status(400).json({success: false, error: "There needs to be a valid id"});
+      return;
+  }
+  
+  let params = [req.params.id];
+  let result = {};
+  db.all("SELECT * from company where id=$1",params, function(err,rows){
+    if(err){
+      res.status(400).json({success: false, error: "Invalid query"});
+    }
+    else
+      rows.forEach(function (row) {
+        console.log(row);
+        result = row;
+        getPurchasedProducts(result , res);
+      }); 
+    }); 
 }
 
 async function getToken(result,res){
@@ -101,16 +124,35 @@ async function getSalesProducts(result,res){
 
 }
 
-exports.test = async function test(req, res, next){
-  console.log("iam the test bae");
-  console.log(db)
-  db.all("SELECT * from company", function(err,rows){
-      if(err)
-      console.log(err);
-      else
-      rows.forEach(function (row) {
-          console.log("im a row") 
-          console.log(row);
-    }); 
-  }); 
-} 
+async function getPurchasedProducts(result,res){
+  let tenant = tenant_differ;
+  let company = token_differ;
+
+  if(result.id == 1){
+    tenant = tenant_sinf;
+    company = token_sinf;
+  }
+
+  let token = result.token;
+    axios
+          .get(url + tenant + company + "purchasescore/purchasesItems/", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "x-www-form-urlencoded"
+            }})
+          .then(response => {
+            let data = response.data;
+            res.status(200).json({ success: true, result: data });
+          })
+          .catch(error => {
+              //console.log(error);
+              //token might have expired or might not even exist so get new token and try again!
+              console.log("will try token");
+              getToken(result).then(response => {
+                result.token =response;
+                getPurchasedProducts(result , res);
+              });
+
+          });
+
+}

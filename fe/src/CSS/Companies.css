@@ -1,16 +1,16 @@
 #Companies {
-    margin-top: 2em;
+    padding-top: 10em;
 }
 
 #Companies h1 {
     font-size: 3rem;
     text-align: center;
-    color: cornflowerblue;
+    color: teal;
     font-weight: bold;
 }
 
 #Company-Card {
-    background-color: grey;
+    background-color: #B2D8D8;
     border-radius: 15px;
     height: 400px;
     width: 480px;

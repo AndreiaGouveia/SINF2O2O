@@ -18,7 +18,6 @@ exports.get_companies_products = async function getCompanyProducts(req, res, nex
     }
     
     let params = [req.params.id];
-    let result = {};
     db.all("SELECT * from company where id=$1",params, function(err,rows){
       if(err){
         res.status(400).json({success: false, error: "Invalid query"});
@@ -26,8 +25,7 @@ exports.get_companies_products = async function getCompanyProducts(req, res, nex
       else
         rows.forEach(function (row) {
           console.log(row);
-          result = row;
-          getSalesProducts(result , res);
+          getSalesProducts(row , res);
         }); 
       }); 
 }
@@ -41,7 +39,6 @@ exports.get_companies_purchased_products = async function getCompanyPurchasedPro
   }
   
   let params = [req.params.id];
-  let result = {};
   db.all("SELECT * from company where id=$1",params, function(err,rows){
     if(err){
       res.status(400).json({success: false, error: "Invalid query"});
@@ -49,9 +46,19 @@ exports.get_companies_purchased_products = async function getCompanyPurchasedPro
     else
       rows.forEach(function (row) {
         console.log(row);
-        result = row;
-        getPurchasedProducts(result , res);
+        getPurchasedProducts(row , res);
       }); 
+    }); 
+}
+
+exports.get_companies_info = async function getCompanyInfo(req, res, next){
+
+  db.all("SELECT * from company", function(err,rows){
+    if(err){
+      res.status(400).json({success: false, error: "Invalid query"});
+    }
+    else
+      res.status(200).json({ success: true, result: rows });
     }); 
 }
 

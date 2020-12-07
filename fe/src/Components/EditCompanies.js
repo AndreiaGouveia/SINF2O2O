@@ -24,12 +24,12 @@ function SaveChanges() {
     console.log(company2);
 }
 
-const EditCompanies = () => (
+const EditCompanies = (props) => (
   <>
     <div id="Companies">
         <Row className="justify-content-around">
-            <Col id="Company1"><h1>Company 1</h1>{EditCompany("SINF")}</Col>
-            <Col id="Company2"><h1>Company 2</h1>{EditCompany("DIFFER")}</Col>
+            <Col id="Company1"><h1>{props.info[0].client_id}</h1>{EditCompany(props.info[0])}</Col>
+            <Col id="Company2"><h1>{props.info[1].client_id}</h1>{EditCompany(props.info[1])}</Col>
         </Row>
         <Row id="ButtonRow" className="justify-content-end">
             <Button variant="primary" onClick={SaveChanges}>
@@ -44,19 +44,19 @@ const EditCompanies = () => (
 
 );
 
-function EditCompany(name) {
+function EditCompany(info) {
     return (
         <Card id="Company-Card">
             <Card.Body>
                 <form>
                     <label for="Grant_Type">Grant_Type</label><br></br>
-                    <input type="text" id="Grant_Type" name="Grant_Type"></input><br></br>
+                    <input type="text" id="Grant_Type" name="Grant_Type" value={info.grant_type}></input><br></br>
                     <label for="Client_ID">Client_ID</label><br></br>
-                    <input type="text" id="Client_ID" name="Client_ID"></input><br></br>
+                    <input type="text" id="Client_ID" name="Client_ID" value={info.client_id}></input><br></br>
                     <label for="Client_Secret">Client_Secret</label><br></br>
-                    <input type="text" id="Client_Secret" name="Client_Secret"></input><br></br>
+                    <input type="text" id="Client_Secret" name="Client_Secret" value={info.client_secret}></input><br></br>
                     <label for="Scope">Scope</label><br></br>
-                    <input type="text" id="Scope" name="Scope"></input>
+                    <input type="text" id="Scope" name="Scope" value={info.scope}></input>
                 </form>
             </Card.Body>
         </Card>

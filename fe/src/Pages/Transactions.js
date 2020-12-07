@@ -1,146 +1,137 @@
 import React from 'react';
-import { withStyles, makeStyles } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
+import { makeStyles } from '@material-ui/core/styles';
+import Box from '@material-ui/core/Box';
+import Collapse from '@material-ui/core/Collapse';
+import IconButton from '@material-ui/core/IconButton';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import Fab from '@material-ui/core/Fab';
 import Paper from '@material-ui/core/Paper';
-import '../CSS/Transactions.css';
-import { Button, Container } from 'react-bootstrap';
-import Accordion from '@material-ui/core/Accordion';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { Fab } from '@material-ui/core';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import AddIcon from '@material-ui/icons/Add';
+import Button from '@material-ui/core/Button';
 
-
-const StyledTableCell = withStyles((theme) => ({
-  head: {
-    backgroundColor: theme.palette.common.black,
-    color: theme.palette.common.white,
-  },
-  body: {
-    fontSize: 14,
-  },
-}))(TableCell);
-
-
-const StyledTableRow = withStyles((theme) => ({
+const useRowStyles = makeStyles({
   root: {
-    "&:nth-of-type(odd)": {
-      backgroundColor: theme.palette.action.white,
+    '& > *': {
+      borderBottom: 'unset',
     },
   },
-}))(TableRow);
+});
 
-  function createData(date, order, supplier, value, status) {
-    return { date, order, supplier, value, status };
-  }
+function createData(date, order, supplier, value) {
+  return {
+    date, order, supplier, value,
+    status: [
+      { company: 'C1', date: '16:35:43 24-02-2020', message: "REJECTED_NO_STOCK" },
+      { company: 'C2', date: '16:30:12 24-02-2020', message: "INITIATE_ORDER" },
+    ],
+  };
+}
 
+function Row(props) {
+  const { row } = props;
+  const [open, setOpen] = React.useState(false);
+  const classes = useRowStyles();
 
-  const rows = [
-    createData('15-09-2020', '1x P1', 'S1', 150, 'v'),
-    createData('03-09-2020', '50x P2', 'S3', 87, 'v'),
-    createData('20-10-2020', '5x P3', 'S3', 789, 'v'),
-  ];
+  return (
+    <React.Fragment>
+      <TableRow className={classes.root}>
+        <TableCell>
+          <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </IconButton>
+        </TableCell>
+        <TableCell align="left">{row.date}</TableCell>
+        <TableCell align="left">{row.order}</TableCell>
+        <TableCell align="center">{row.supplier}</TableCell>
+        <TableCell align="center">{row.value}</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <Box margin={1}>
+              <Table size="small" aria-label="purchases">
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="center">Company</TableCell>
+                    <TableCell align="center">Date</TableCell>
+                    <TableCell align="center">Message</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {row.status.map((statusRow) => (
+                    <TableRow key={statusRow.company}>
+                      <TableCell align="center" component="th" scope="row">
+                        {statusRow.company}
+                      </TableCell>
+                      <TableCell align="center">{statusRow.date}</TableCell>
+                      <TableCell align="center">{statusRow.message}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Box>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </React.Fragment>
 
-  const useStyles = makeStyles({
-    table: {
-      maxWidth: 1000,
-    },
-  });
+  );
+}
 
-  function Transactions() {
-    const classes = useStyles();
+Row.propTypes = {
+  row: PropTypes.shape({
+    date: PropTypes.string.isRequired,
+    order: PropTypes.string.isRequired,
+    supplier: PropTypes.string.isRequired,
+    value: PropTypes.number.isRequired,
+    status: PropTypes.arrayOf(
+      PropTypes.shape({
+        company: PropTypes.string.isRequired,
+        date: PropTypes.string.isRequired,
+        message: PropTypes.string.isRequired,
+      }),
+    ).isRequired,
+  }).isRequired,
+};
 
-    return (
-      <Container id="container">
-        <Button disabled={true} variant="contained">Transactions</Button>
+const rows = [
+  createData('15-09-2020', '1x P1', 'S1', 150),
+  createData('03-09-2020', '50x P2', 'S3', 87),
+  createData('20-10-2020', '5x P3', 'S3', 789),
+];
 
+export default function CollapsibleTable() {
+  return (
+    <TableContainer component={Paper}>
+      <Button disabled={true} variant="contained">Transactions</Button>
+      <Table aria-label="collapsible table">
+        <TableHead>
+          <TableRow>
+            <TableCell align="left">Status&nbsp;</TableCell>
+            <TableCell align="left">Date&nbsp;</TableCell>
+            <TableCell align="left">Order&nbsp;</TableCell>
+            <TableCell align="center">Supplier&nbsp;</TableCell>
+            <TableCell align="center">Value&nbsp;</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.map((row) => (
+            <Row key={row.name} row={row} />
+          ))}
+        </TableBody>
+      </Table>
 
-
-        <TableContainer component={Paper}>
-          <Table className={classes.table} aria-label="customized table">
-            <TableHead>
-              <TableRow>
-                <StyledTableCell align="left">Date&nbsp;</StyledTableCell>
-                <StyledTableCell align="left">Order&nbsp;</StyledTableCell>
-                <StyledTableCell align="center">Supplier&nbsp;</StyledTableCell>
-                <StyledTableCell align="center">Value&nbsp;</StyledTableCell>
-                <StyledTableCell align="center">Status&nbsp;</StyledTableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row) => (
-                <StyledTableRow key={row.order}>
-                  <StyledTableCell align="left">{row.date}</StyledTableCell>
-                  <StyledTableCell align="left">{row.order}</StyledTableCell>
-                  <StyledTableCell align="center">{row.supplier}</StyledTableCell>
-                  <StyledTableCell align="center">{row.value}</StyledTableCell>
-                  <StyledTableCell align="center">{SimpleAccordion()}</StyledTableCell>
-                </StyledTableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <Fab id="addButton" aria-label="add">+</Fab>
-
-        </TableContainer>
-      </Container>
-
-    );
-  }
-
-  function createsubData(company, date, message) {
-    return { company, date, message };
-  }
-
-  const subrows = [
-    createsubData('C1', '16:35:43 24-02-2020', 'REJECTED_NO_STOCK'),
-    createsubData('C2', '16:30:12 24-02-2020', 'INITIATE_ORDER'),
-  ];
-
-
-  function SimpleAccordion() {
-    const classes = useStyles();
-
-    return (
-      <div className={classes.root}>
-        <Accordion>
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel1a-content"
-            id="panel1a-header"
-          >
-          </AccordionSummary>
-          <AccordionDetails>
-            <Table className={classes.table} aria-label="customized table">
-              <TableHead>
-                <TableRow>
-                  <StyledTableCell id="subHeaderBegin" align="center">Company&nbsp;</StyledTableCell>
-                  <StyledTableCell align="center">Date&nbsp;</StyledTableCell>
-                  <StyledTableCell id="subHeaderEnd" align="center">Message&nbsp;</StyledTableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody >
-                {subrows.map((row) => (
-                  <StyledTableRow key={row.company}>
-                    <StyledTableCell id="status" align="center">{row.company}</StyledTableCell>
-                    <StyledTableCell id="status" align="center">{row.date}</StyledTableCell>
-                    <StyledTableCell id="status" align="center">{row.message}</StyledTableCell>
-
-                  </StyledTableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </AccordionDetails>
-        </Accordion>
-
-      </div>
-    );
-  }
-
-
-
-  export default Transactions;
+      <Fab color="primary" aria-label="add">
+        <AddIcon />
+      </Fab>
+    </TableContainer>
+  );
+}

@@ -62,6 +62,17 @@ exports.get_companies_info = async function getCompanyInfo(req, res, next){
     }); 
 }
 
+exports.get_warehouses = async function getWarehouses(req, res, next){
+
+  db.all("SELECT * from company", function(err,rows){
+    if(err){
+      res.status(400).json({success: false, error: "Invalid query"});
+    }
+    else
+      res.status(200).json({ success: true, result: rows });
+    }); 
+}
+
 async function getToken(result,res){
       //get token!!
       const form = new FormData();
@@ -115,7 +126,7 @@ async function getSalesProducts(result,res){
               "Content-Type": "x-www-form-urlencoded"
             }})
           .then(response => {
-            let data = response.data;
+            let data = filterInformation(response.data);
             res.status(200).json({ success: true, result: data });
           })
           .catch(error => {
@@ -129,6 +140,23 @@ async function getSalesProducts(result,res){
 
           });
 
+}
+
+function filterInformation(data) {
+  let result = [];
+
+  data.forEach(ub => {
+    if(ub.priceListLines.length != 0) {
+      result.push({
+        'key' : ub.itemKey,
+        'description' : ub.description,
+        'brand' : ub.brand,
+        'price' : ub.priceListLines[0].priceAmount.amount
+      });
+    }
+  });
+  
+  return result;
 }
 
 async function getPurchasedProducts(result,res){

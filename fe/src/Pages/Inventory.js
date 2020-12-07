@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {Route} from 'react-router-dom'
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Tab from 'react-bootstrap/Tab';
@@ -35,13 +36,13 @@ class Inventory extends Component {
                     <Col sm={9}>
                     <Tab.Content>
                         <Tab.Pane eventKey="first">
-                            <InventoryComponentProducts companyName="Company1" />
+                            <InventoryComponentProducts />
                         </Tab.Pane>
                         <Tab.Pane eventKey="second">
-                            <InventoryComponentWarehouses companyName="Company2" />
+                            <InventoryComponentWarehouses />
                         </Tab.Pane>
                         <Tab.Pane eventKey="third">
-                            <InventoryComponentEntities companyName="Company3" />
+                            <InventoryComponentEntities />
                         </Tab.Pane>
                     </Tab.Content>
                     </Col>

@@ -17,6 +17,7 @@ import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
 import "../CSS/Transactions.css";
+import { Component } from "react";
 
 const useRowStyles = makeStyles({
   root: {
@@ -109,7 +110,8 @@ const rows = [
   createData('20-10-2020', '5x P3', 'S3', 789),
 ];
 
-export default function Transactions() {
+class Transactions extends Component {
+  render(){
   return (
     <TableContainer component={Paper}>
       <Button id="transactions-label" disabled={true} variant="contained">Transactions</Button>
@@ -136,3 +138,6 @@ export default function Transactions() {
     </TableContainer>
   );
 }
+}
+
+export default Transactions;

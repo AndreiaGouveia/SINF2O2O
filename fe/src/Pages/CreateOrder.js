@@ -19,6 +19,7 @@ import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
 import Form from 'react-bootstrap/Form'
 import { Col, Row } from "react-bootstrap";
+import { Component } from "react";
 
 
 
@@ -47,126 +48,131 @@ const useStyles = makeStyles({
   table: {
     maxWidth: 1000,
   },
-});
+}); 
 
 
 
-export default function CreateOrder() {
-  const classes = useStyles();
+class CreateOrder extends Component {
 
-  const [state, setState] = React.useState({
-    company: "",
-    name: "hai",
-  });
-
-  const handleChange = (event) => {
-    const name = event.target.name;
-    setState({
-      ...state,
-      [name]: event.target.value,
-    });
-  };
-
-  const [open, setOpen] = React.useState(false);
-
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  return (
-    <Container id="container">
-      <Button id="createOrder-label" disabled={true} variant="contained">Create Order</Button>
-      <Button href="Transactions" id="cancel" variant="contained">Cancel</Button>
-      <Form id="form">
-        <Form.Group id="row" as={Row} controlId="formPlaintextEmail">
-          <Form.Label column sm="2">
-            <Paper id="first-label" className={classes.paper}> Supplier </Paper>
-          </Form.Label>
-          <Col sm="10">
-            <Select
-              native
-              value={state.company}
-              onChange={handleChange}
-              inputProps={{
-                name: "company",
-                id: "filled-company-native-simple",
-              }}
-            >
-              <option aria-label="None" value="" />
-              <option value={10}> C1 </option> <option value={20}> C2 </option>
-            </Select>
-          </Col>
-        </Form.Group>
-
-        <Form.Group id="rowproduct" as={Row} controlId="formPlaintextPassword">
-          <Form.Label  column sm="2">
-            <Paper  className={classes.paper}> Product </Paper>
-          </Form.Label>
-          <Col sm="10">
-            <Button id="label" onClick={handleClickOpen}> Select your Product </Button>
-          </Col>
-        </Form.Group>
-        <Grid container spacing={3}>
-
-          <Dialog
-            disableBackdropClick
-            disableEscapeKeyDown
-            open={open}
-            onClose={handleClose}
-          >
-            <DialogTitle > Select your Product </DialogTitle>
-            {<DialogContent>
-              <Table className={classes.table} aria-label="customized table">
-                <TableBody> {TableProducts()} </TableBody>
-              </Table>
-            </DialogContent>}
-            <DialogActions>
-              <Button id="sub-buttons" onClick={handleClose} color="primary">
-                Cancel
-                    </Button>
-              <Button id="sub-buttons" onClick={handleClose} color="primary">
-                Ok
-                    </Button>
-            </DialogActions>
-          </Dialog>
-
-        </Grid>
-        <Form.Group id="row" as={Row} controlId="formPlaintextPassword">
-          <Form.Label column sm="2">
-            <Paper className={classes.paper}> Quantity </Paper>
-          </Form.Label>
-          <Col sm="10">
-            <TextField
-              id="outlined-number"
-              label="Number"
-              type="number"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              variant="outlined"
-            />        </Col>
-        </Form.Group>
-
-        <Form.Group id="row"as={Row} controlId="formPlaintextPassword">
-          <Form.Label column sm="2">
-            <Paper className={classes.paper}> Total </Paper>
-          </Form.Label>
-          <Col sm="10">
-            <Button id="label" disabled={true} variant="contained">Total</Button>
-          </Col>
-        </Form.Group>
-
-      </Form>
-      <Button id="submit" variant="contained">Submit</Button>
-
-    </Container>
-  );
+constructor(props) {
+  super(props);
+this.state={
+  company:"",
+  name:"hai"
+};
 }
+
+
+  render() {
+
+
+    const handleChange=(event) => {    
+      this.setState({
+        name: this.state.name,
+        steps: this.state.itemsForm,
+        open:false
+      });  
+    };
+    const handleClickOpen = () => {
+      this.setState({open: true});
+    };
+
+    const handleClose = () => {
+      this.setState({open: false});
+    };
+
+    return (
+      <Container id="container">
+        <Button id="createOrder-label" disabled={true} variant="contained">Create Order</Button>
+        <Button href="Transactions" id="cancel" variant="contained">Cancel</Button>
+        <Form id="form">
+          <Form.Group id="row" as={Row} controlId="formPlaintextEmail">
+            <Form.Label column sm="2">
+               Supplier
+            </Form.Label>
+            <Col sm="10">
+              <Select
+                native
+                //value={state.company}------------------------------todo, onde guardar
+                onChange={handleChange}
+                inputProps={{
+                  name: "company",
+                  id: "filled-company-native-simple",
+                }}
+              >
+                <option aria-label="None" value="" />
+                <option value={10}> C1 </option> <option value={20}> C2 </option>
+              </Select>
+            </Col>
+          </Form.Group>
+
+          <Form.Group id="rowproduct" as={Row} controlId="formPlaintextPassword">
+            <Form.Label column sm="2">
+               Product
+            </Form.Label>
+            <Col sm="10">
+              <Button id="label" onClick={handleClickOpen}> Select your Product </Button>
+            </Col>
+          </Form.Group>
+          <Grid container spacing={3}>
+
+            <Dialog
+              disableBackdropClick
+              disableEscapeKeyDown
+              open={this.open}
+              onClose={handleClose}
+            >
+              <DialogTitle > Select your Product </DialogTitle>
+              {<DialogContent>
+                <Table aria-label="customized table">
+                  <TableBody> { new TableProducts()} </TableBody>
+                </Table>
+              </DialogContent>}
+              <DialogActions>
+                <Button id="sub-buttons" onClick={handleClose} color="primary">
+                  Cancel
+                    </Button>
+                <Button id="sub-buttons" onClick={handleClose} color="primary">
+                  Ok
+                    </Button>
+              </DialogActions>
+            </Dialog>
+
+          </Grid>
+          <Form.Group id="row" as={Row} controlId="formPlaintextPassword">
+            <Form.Label column sm="2">
+              Quantity 
+            </Form.Label>
+            <Col sm="10">
+              <TextField
+                id="outlined-number"
+                label="Number"
+                type="number"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                variant="outlined"
+              />        </Col>
+          </Form.Group>
+
+          <Form.Group id="row" as={Row} controlId="formPlaintextPassword">
+            <Form.Label column sm="2">
+              Total 
+            </Form.Label>
+            <Col sm="10">
+              <Button id="label" disabled={true} variant="contained">Total</Button>
+            </Col>
+          </Form.Group>
+
+        </Form>
+        <Button id="submit" variant="contained">Submit</Button>
+
+      </Container>
+    );
+
+  }
+}
+
 
 
 
@@ -179,11 +185,11 @@ const subrows = [
   createsubData("P2", "3", "cat food"),
 ];
 
-function TableProducts() {
-  const classes = useStyles();
-
+class TableProducts extends Component{
+  /* classes = useStyles(); */
+render(){
   return (
-    <Table className={classes.table} aria-label="customized table">
+    <Table /* className={classes.table} */ aria-label="customized table">
       <TableHead>
         <TableRow>
           <StyledTableCell id="header"> </StyledTableCell>
@@ -203,7 +209,7 @@ function TableProducts() {
           <StyledTableRow key={row.company}>
             <StyledTableCell id="check">
               <Checkbox
-                color= ""
+                color=""
                 inputProps={{ "aria-label": "checkbox" }}
               />
             </StyledTableCell>
@@ -225,3 +231,6 @@ function TableProducts() {
     </Table>
   );
 }
+}
+
+export default CreateOrder;

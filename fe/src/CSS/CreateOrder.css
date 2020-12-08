@@ -33,11 +33,18 @@
     margin:auto !important;
 }
 
-.row {
+#row {
     margin-bottom: 1rem;
     max-width: 50%;
     margin: auto !important;
     margin-bottom: 50px !important;
+}
+
+#rowproduct{
+    margin-bottom: 1rem;
+    max-width: 50%;
+    margin: auto !important;
+    margin-bottom: 70px !important;
 }
 
 #label {

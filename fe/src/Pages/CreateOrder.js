@@ -83,7 +83,7 @@ export default function CreateOrder() {
       <Button id="createOrder-label" disabled={true} variant="contained">Create Order</Button>
       <Button href="Transactions" id="cancel" variant="contained">Cancel</Button>
       <Form id="form">
-        <Form.Group as={Row} controlId="formPlaintextEmail">
+        <Form.Group id="row" as={Row} controlId="formPlaintextEmail">
           <Form.Label column sm="2">
             <Paper id="first-label" className={classes.paper}> Supplier </Paper>
           </Form.Label>
@@ -103,9 +103,9 @@ export default function CreateOrder() {
           </Col>
         </Form.Group>
 
-        <Form.Group as={Row} controlId="formPlaintextPassword">
-          <Form.Label column sm="2">
-            <Paper className={classes.paper}> Product </Paper>
+        <Form.Group id="rowproduct" as={Row} controlId="formPlaintextPassword">
+          <Form.Label  column sm="2">
+            <Paper  className={classes.paper}> Product </Paper>
           </Form.Label>
           <Col sm="10">
             <Button id="label" onClick={handleClickOpen}> Select your Product </Button>
@@ -136,7 +136,7 @@ export default function CreateOrder() {
           </Dialog>
 
         </Grid>
-        <Form.Group as={Row} controlId="formPlaintextPassword">
+        <Form.Group id="row" as={Row} controlId="formPlaintextPassword">
           <Form.Label column sm="2">
             <Paper className={classes.paper}> Quantity </Paper>
           </Form.Label>
@@ -152,7 +152,7 @@ export default function CreateOrder() {
             />        </Col>
         </Form.Group>
 
-        <Form.Group as={Row} controlId="formPlaintextPassword">
+        <Form.Group id="row"as={Row} controlId="formPlaintextPassword">
           <Form.Label column sm="2">
             <Paper className={classes.paper}> Total </Paper>
           </Form.Label>

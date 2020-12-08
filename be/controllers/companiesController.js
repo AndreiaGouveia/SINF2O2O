@@ -59,19 +59,29 @@ exports.get_companies_info = async function getCompanyInfo(req, res, next){
     }
     else
       res.status(200).json({ success: true, result: rows });
-    }); 
+  }); 
 }
 
-exports.get_warehouses = async function getWarehouses(req, res, next){
+exports.get_warehouses = async function getCompanyWarehouses(req, res, next){
+  if(req.params.id != 0 && req.params.id != 1){
+    res.status(400).json({success: false, error: "There needs to be a valid id"});
+    return;
+  }
 
-  db.all("SELECT * from company", function(err,rows){
+  let params = [req.params.id];
+  db.all("SELECT * from company where id=$1",params, function(err,rows){
     if(err){
       res.status(400).json({success: false, error: "Invalid query"});
     }
     else
-      res.status(200).json({ success: true, result: rows });
-    }); 
+      rows.forEach(function (row) {
+        console.log(req.params.id);
+        getWarehouses(row, res);
+      }); 
+  });
 }
+   
+
 
 async function getToken(result,res){
       //get token!!
@@ -169,25 +179,73 @@ async function getPurchasedProducts(result,res){
   }
 
   let token = result.token;
-    axios
-          .get(url + tenant + company + "purchasescore/purchasesItems/", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "x-www-form-urlencoded"
-            }})
-          .then(response => {
-            let data = response.data;
-            res.status(200).json({ success: true, result: data });
-          })
-          .catch(error => {
-              //console.log(error);
-              //token might have expired or might not even exist so get new token and try again!
-              console.log("will try token");
-              getToken(result).then(response => {
-                result.token =response;
-                getPurchasedProducts(result , res);
-              });
+  axios
+    .get(url + tenant + company + "purchasescore/purchasesItems/", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "x-www-form-urlencoded"
+      }
+    })
+    .then(response => {
+      let data = response.data;
+      res.status(200).json({ success: true, result: data });
+    })
+    .catch(error => {
+      //console.log(error);
+      //token might have expired or might not even exist so get new token and try again!
+      console.log("will try token");
+      getToken(result).then(response => {
+        result.token =response;
+        getPurchasedProducts(result , res);
+      });
+    });
+}
 
-          });
+async function getWarehouses(result, res) {
+  console.log(result);
+  let tenant = tenant_differ;
+  let company = token_differ;
 
+  if(result.id == 1){
+    tenant = tenant_sinf;
+    company = token_sinf;
+  }
+//https://my.jasminsoftware.com/api/243034/243034-0001/materialscore/warehouses/
+  let token = result.token;
+  axios
+    .get(url + tenant + company + "materialscore/warehouses/", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "x-www-form-urlencoded"
+      }
+    })
+    .then(response => {
+      let data = filterWarehouse(response.data);
+      res.status(200).json({ success: true, result: data });
+    })
+    .catch(error => {
+      //token might have expired or might not even exist so get new token and try again!
+      console.log("will try token");
+      getToken(result).then(response => {
+        result.token = response;
+        getWarehouses(result , res);
+      });
+    });
+}
+
+function filterWarehouse(data) {
+  let result = [];
+
+  data.forEach(ub => {
+    if(ub.streetName != null) {
+      result.push({
+        'key' : ub.warehouseKey,
+        'street' : ub.streetName,
+        'city' : ub.cityName,
+        'country' : ub.countryDescription
+      });
+    }
+  });
+
+  return result;
 }

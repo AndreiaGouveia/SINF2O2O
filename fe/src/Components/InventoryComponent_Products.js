@@ -11,7 +11,7 @@ class InventoryComponent_Products extends Component {
         this.state = {
             isLoading : true,
             company : 0,
-            date : []
+            data : []
         }
 
         this.changeCompany = this.changeCompany.bind(this);

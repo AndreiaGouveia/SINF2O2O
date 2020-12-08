@@ -109,7 +109,7 @@ const rows = [
   createData('20-10-2020', '5x P3', 'S3', 789),
 ];
 
-export default function CollapsibleTable() {
+export default function Transactions() {
   return (
     <TableContainer component={Paper}>
       <Button id="transactions-label" disabled={true} variant="contained">Transactions</Button>

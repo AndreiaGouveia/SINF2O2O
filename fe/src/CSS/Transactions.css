@@ -1,83 +1,85 @@
-.WithStyles\(ForwardRef\(TableCell\)\)-head-2 {
-    background-color: white !important;
-    color:black !important; 
-    
-}
-
 .MuiPaper-elevation1 {
     box-shadow: none !important;
+    padding: 0 !important;
+    border:none!important;
 }
 
 .MuiTableContainer-root {
-    width: 100%;
-    overflow-x: auto;
-    padding: 100px 150px 200px 400px;
+    width: 100% !important;
+    height: 100% !important;
+    overflow-x: none;
+    padding: 100px 0px 0px 1200px;
 }
 
-.MuiAccordionDetails-root {
-    display: flex;
-    flex-direction: column !important;
-    background-color: #008ae6;
-    border-radius: 10px;
-   
+#transactions-label{
+    margin: 100px;
+    font-size: 1.5em;
+    background-color: rgba(235, 235, 235, 0.932) ;
+    color: teal;
+    font-style: inherit;
+    font-weight: bold;
+    text-align: center !important;
 }
 
-.MuiAccordionSummary-expandIcon:hover {
-    background-color: #008ae6 !important;
-    
+#collapsible-table{
+    width: 50% !important;
+    margin:auto;
 }
 
-#status{
-    color:white!important;
+#collapsible-table{
+    width: 50% !important;
+    margin:auto;
 }
 
-#subHeaderBegin{
-    color: rgba(0, 0, 0, 0.87);
-    font-weight: 500;
+.MuiTableCell-head {
+    color:white !important;
+    font-weight: bold !important;
+    font-size: 1em !important;
     line-height: 1.5rem;
-    border-radius: 10px 0px 0px 10px ;
+    background-color: teal;
 }
 
-#subHeaderEnd{
-    color: rgba(0, 0, 0, 0.87);
-    font-weight: 500;
-    line-height: 1.5rem;
-    border-radius: 0px 10px 10px 00px ;
+#min-col{
+    padding:0 !important;
+    max-width: 15px;
 }
 
-#container{
-    min-width: 100%;
+#date-col{
+    padding: 0 !important;
+    max-width: 20px;
 }
 
-.btn {
-    display: inline-block;
-    font-weight: 1000;
-    color: white;
-    text-align: center;
-    vertical-align: middle;
-    cursor: inherit;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    background-color: #008ae6;
-    padding: 1rem 2rem;
-    font-size: 2rem;
-    line-height: 1.5;
-    border-radius: .25rem;
-    margin: 100px 100px 1px;
+#supplier-col{
+    padding: 0 !important;
+    max-width: 20px;
 }
 
-.btn:hover {
-    color: white;
-    text-decoration: none;
+#order-col{
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    max-width: 100px;
 }
 
-#addButton{
-    background-color: rgb(236, 220, 76);
-    color: white;
-    font-size: 50px;
-    text-align: center;
-    vertical-align: middle;
-    margin: 100px 1100px;
+#sub-table{
+    background-color: rgb(243, 243, 243) !important;
+}
+
+#sub-table-header{
+    background-color: rgb(223, 223, 223) !important;
+    color: teal !important;
+}
+
+
+a:hover {
+    color: black;
+    text-decoration: underline;
+}
+
+.MuiFab-primary {
+    color: #fff;
+    background-color: teal !important;
+    box-shadow: none!important;
+    margin-left: 1450px!important;
+    margin-top: 150px!important;
+    margin-bottom: 200px !important;
 }

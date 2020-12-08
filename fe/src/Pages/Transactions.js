@@ -16,6 +16,7 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
+import "../CSS/Transactions.css";
 
 const useRowStyles = makeStyles({
   root: {
@@ -43,15 +44,15 @@ function Row(props) {
   return (
     <React.Fragment>
       <TableRow className={classes.root}>
-        <TableCell>
-          <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+        <TableCell id="min-col" align="center">
+          <IconButton  aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell align="left">{row.date}</TableCell>
-        <TableCell align="left">{row.order}</TableCell>
-        <TableCell align="center">{row.supplier}</TableCell>
-        <TableCell align="center">{row.value}</TableCell>
+        <TableCell id="date-col" align="left">{row.date}</TableCell>
+        <TableCell id="order-col" align="left">{row.order}</TableCell>
+        <TableCell id="supplier-col" align="center">{row.supplier}</TableCell>
+        <TableCell id="min-col" align="center">{row.value}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -60,19 +61,19 @@ function Row(props) {
               <Table size="small" aria-label="purchases">
                 <TableHead>
                   <TableRow>
-                    <TableCell align="center">Company</TableCell>
-                    <TableCell align="center">Date</TableCell>
-                    <TableCell align="center">Message</TableCell>
+                    <TableCell id="sub-table-header" align="center">Company</TableCell>
+                    <TableCell id="sub-table-header" align="center">Date</TableCell>
+                    <TableCell id="sub-table-header" align="center">Message</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {row.status.map((statusRow) => (
                     <TableRow key={statusRow.company}>
-                      <TableCell align="center" component="th" scope="row">
+                      <TableCell id="sub-table" align="center" component="th" scope="row">
                         {statusRow.company}
                       </TableCell>
-                      <TableCell align="center">{statusRow.date}</TableCell>
-                      <TableCell align="center">{statusRow.message}</TableCell>
+                      <TableCell id="sub-table" align="center">{statusRow.date}</TableCell>
+                      <TableCell id="sub-table" align="center">{statusRow.message}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -111,15 +112,15 @@ const rows = [
 export default function CollapsibleTable() {
   return (
     <TableContainer component={Paper}>
-      <Button disabled={true} variant="contained">Transactions</Button>
-      <Table aria-label="collapsible table">
+      <Button id="transactions-label" disabled={true} variant="contained">Transactions</Button>
+      <Table id="collapsible-table" aria-label="collapsible table">
         <TableHead>
           <TableRow>
-            <TableCell align="left">Status&nbsp;</TableCell>
-            <TableCell align="left">Date&nbsp;</TableCell>
-            <TableCell align="left">Order&nbsp;</TableCell>
-            <TableCell align="center">Supplier&nbsp;</TableCell>
-            <TableCell align="center">Value&nbsp;</TableCell>
+            <TableCell id="min-col"  align="center">Status</TableCell>
+            <TableCell id="date-col" align="left">Date&nbsp;</TableCell>
+            <TableCell id="order-col" align="left">Order&nbsp;</TableCell>
+            <TableCell id="supplier-col" align="center">Supplier&nbsp;</TableCell>
+            <TableCell id="min-col" align="center">Value&nbsp;</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -129,7 +130,7 @@ export default function CollapsibleTable() {
         </TableBody>
       </Table>
 
-      <Fab color="primary" aria-label="add">
+      <Fab href="CreateOrder" color="primary" aria-label="add">
         <AddIcon />
       </Fab>
     </TableContainer>

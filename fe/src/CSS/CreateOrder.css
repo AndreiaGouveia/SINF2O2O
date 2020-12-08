@@ -1,4 +1,4 @@
-#createbutton {
+/* #createbutton {
     display: inline-block;
     font-weight: 1000;
     color: #008ae6;
@@ -70,13 +70,6 @@ MuiInputBase-input {
     letter-spacing: inherit;
     animation-duration: 10ms;
     -webkit-tap-highlight-color: transparent;
-}
-
-.MuiTableCell-head {
-    color: white !important;
-    font-weight: 500;
-    line-height: 1.5rem;
-    background-color: #008ae6 !important;
 }
 
 #submit {
@@ -189,4 +182,4 @@ button.btn.btn-contained {
         margin: 20px 0px 10px 10px;
         min-width: 20px;
         max-width: 500px;
-}
+} */

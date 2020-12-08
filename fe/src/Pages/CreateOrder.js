@@ -9,7 +9,6 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import "../CSS/CreateOrder.css";
 import { Button, Container } from "react-bootstrap";
-import { Fab } from "@material-ui/core";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
@@ -55,7 +54,7 @@ const useStyles = makeStyles({
   },
 });
 
-function Transactions() {
+function CreateOrder() {
   const classes = useStyles();
 
   const [state, setState] = React.useState({
@@ -239,4 +238,4 @@ function TableProducts() {
   );
 }
 
-export default Transactions;
+export default CreateOrder;

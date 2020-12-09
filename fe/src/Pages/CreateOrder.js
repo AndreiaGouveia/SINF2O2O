@@ -52,12 +52,28 @@ class CreateOrder extends Component {
     super(props);
     this.state = {
       company: "",
-      name: "hai"
+      name: "hai",
+      isLoading: true,
+      data: []
     };
   }
 
+  componentDidMount() {
+    const requestOptions = {
+      method: 'GET',
+    };
+
+    fetch('http://localhost:5000/transaction/salesitems', requestOptions)
+      .then((res) => (res.clone().text()))
+      .then((res) => (this.setState((prevState) => ({
+        isLoading: !prevState.isLoading,
+        data: JSON.parse(res).result
+      }))));
+
+  }
 
   render() {
+
 
 
     const handleChange = (event) => {
@@ -84,114 +100,107 @@ class CreateOrder extends Component {
         this.setState({ value });
       }
     };
-
-    return (
-      <Container id="container">
-        <Button id="createOrder-label" disabled={true} variant="contained">Create Order</Button>
-        <Button href="Transactions" id="cancel" variant="contained">Cancel</Button>
-        <Form id="form">
-          <Form.Group id="row" as={Row} controlId="formPlaintextEmail">
-            <Form.Label column sm="2">
-              Supplier
+    if (this.state.isLoading) {
+      return (
+        <h1>I am loading</h1>
+      );
+    } else {
+      console.log(this.state.data)
+      return (
+        <Container id="container">
+          <Button id="createOrder-label" disabled={true} variant="contained">Create Order</Button>
+          <Button href="Transactions" id="cancel" variant="contained">Cancel</Button>
+          <Form id="form">
+            <Form.Group id="row" as={Row} controlId="formPlaintextEmail">
+              <Form.Label column sm="2">
+                Supplier
             </Form.Label>
-            <Col sm="10">
-              <Select
-                native
-                //value={state.company}------------------------------todo, onde guardar
-                onChange={handleChange}
-                inputProps={{
-                  name: "company",
-                  id: "filled-company-native-simple",
-                }}
-              >
-                <option aria-label="None" value="" />
-                <option value={10}> SINF </option>
-              </Select>
-            </Col>
-          </Form.Group>
+              <Col sm="10">
+                <Select
+                  native
+                  //value={state.company}------------------------------todo, onde guardar
+                  onChange={handleChange}
+                  inputProps={{
+                    name: "company",
+                    id: "filled-company-native-simple",
+                  }}
+                >
+                  <option aria-label="None" value="" />
+                  <option value={10}> SINF </option>
+                </Select>
+              </Col>
+            </Form.Group>
 
-          <Form.Group id="rowproduct" as={Row} controlId="formPlaintextPassword">
-            <Form.Label column sm="2">
-              Product
+            <Form.Group id="rowproduct" as={Row} controlId="formPlaintextPassword">
+              <Form.Label column sm="2">
+                Product
             </Form.Label>
-            <Col sm="10">
-              <Button id="label" onClick={handleClickOpen}> Select your Product </Button>
-            </Col>
-          </Form.Group>
-          <Grid container spacing={3}>
+              <Col sm="10">
+                <Button id="label" onClick={handleClickOpen}> Select your Product </Button>
+              </Col>
+            </Form.Group>
+            <Grid container spacing={3}>
 
 
-            <Dialog onClose={handleClose} aria-labelledby="customized-dialog-title" open={this.state.open}>
-              <DialogTitle> Select your Product </DialogTitle>
+              <Dialog onClose={handleClose} aria-labelledby="customized-dialog-title" open={this.state.open}>
+                <DialogTitle> Select your Product </DialogTitle>
 
-              <DialogContent>
-                <Table aria-label="customized table">
-                  <TableBody> {TableProducts()} </TableBody>
-                </Table>
-              </DialogContent>
+                <DialogContent>
+                  <Table aria-label="customized table">
+                    <TableBody> {TableProducts(this.state.data)} </TableBody>
+                  </Table>
+                </DialogContent>
 
-              <DialogActions>
-                <Button autoFocus onClick={handleClose} color="">
-                  Cancel
+                <DialogActions>
+                  <Button autoFocus onClick={handleClose} color="">
+                    Cancel
           </Button>
-                <Button autoFocus onClick={handleClose} color="">
-                  Save
+                  <Button autoFocus onClick={handleClose} color="">
+                    Save
           </Button>
-              </DialogActions>
-            </Dialog>
+                </DialogActions>
+              </Dialog>
 
-          </Grid>
-          <Form.Group id="row" as={Row} controlId="formPlaintextPassword">
-            <Form.Label column sm="2">
-              Quantity
+            </Grid>
+            <Form.Group id="row" as={Row} controlId="formPlaintextPassword">
+              <Form.Label column sm="2">
+                Quantity
             </Form.Label>
-            <Col sm="10">
-              <TextField
-                id="outlined-number"
-                label="Number"
-                type="number"
-                value={this.state.value}
-                onChange={onChange}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                variant="outlined"
-              />        </Col>
-          </Form.Group>
+              <Col sm="10">
+                <TextField
+                  id="outlined-number"
+                  label="Number"
+                  type="number"
+                  value={this.state.value}
+                  onChange={onChange}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  variant="outlined"
+                />        </Col>
+            </Form.Group>
 
-          <Form.Group id="row" as={Row} controlId="formPlaintextPassword">
-            <Form.Label column sm="2">
-              Total
+            <Form.Group id="row" as={Row} controlId="formPlaintextPassword">
+              <Form.Label column sm="2">
+                Total
             </Form.Label>
-            <Col sm="10">
-              <Button id="label" disabled={true} variant="contained">Total</Button>
-            </Col>
-          </Form.Group>
+              <Col sm="10">
+                <Button id="label" disabled={true} variant="contained">Total</Button>
+              </Col>
+            </Form.Group>
 
-        </Form>
-        <Button id="submit" variant="contained">Submit</Button>
+          </Form>
+          <Button id="submit" variant="contained">Submit</Button>
 
-      </Container>
-    );
+        </Container>
+      );
 
+    }
   }
 }
 
 
-
-
-function createsubData(product, value, description) {
-  return { product, value, description };
-}
-
-const subrows = [
-  createsubData("P1", "15", "towels"),
-  createsubData("P2", "3", "cat food"),
-];
-
-
-
-function TableProducts() {
+function TableProducts(data) {
 
 
   return (
@@ -202,17 +211,19 @@ function TableProducts() {
           <StyledTableCell id="header" align="center">
             Product Name
           </StyledTableCell>
-          <StyledTableCell id="header" align="center"> Value / Un </StyledTableCell>
-          <StyledTableCell id="header" align="center">
-
-            Description
-          </StyledTableCell>
+          <StyledTableCell id="header" align="center"> Description </StyledTableCell>
+          <StyledTableCell id="header" align="center"> Value/Un    </StyledTableCell>
         </TableRow>
       </TableHead>
       <TableBody>
 
-        {subrows.map((row) => (
-          <StyledTableRow key={row.company}>
+        {data.filter(aux => aux.itemKey != "PORTES").map((items) => {
+          var item = items.itemKey;
+          var description = items.complementaryDescription;
+          var value = items.priceListLines[0].priceAmount.amount + ' ' + items.priceListLines[0].priceAmount.symbol;
+          /* console.log(item, value, description); */
+          return (
+          <StyledTableRow key={item}>
             <StyledTableCell id="check">
               <Checkbox
                 color=""
@@ -220,19 +231,16 @@ function TableProducts() {
               />
             </StyledTableCell>
             <StyledTableCell id="products" align="center">
-
-              {row.product}
+              {item}
             </StyledTableCell>
             <StyledTableCell id="products" align="center">
-
-              {row.value}
+              {description}
             </StyledTableCell>
             <StyledTableCell id="products" align="center">
-
-              {row.description}
+              {value}
             </StyledTableCell>
-          </StyledTableRow>
-        ))}
+          </StyledTableRow>)
+        })}
       </TableBody>
     </Table>
   );

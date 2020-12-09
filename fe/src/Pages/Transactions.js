@@ -160,7 +160,7 @@ class Transactions extends Component {
                 var order = orders.documentLines[0].quantity + 'x ' + orders.documentLines[0].description;
                 var supplier = orders.sellerSupplierPartyName;
                 var value = orders.payableAmount.amount + ' ' + orders.payableAmount.symbol;
-                console.log(date, order, supplier, value);
+                /* console.log(date, order, supplier, value); */
                 return <Row row={createData(date, order, supplier, value)} />;
               })}
             </TableBody>

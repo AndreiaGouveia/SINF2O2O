@@ -49,7 +49,7 @@ async function getToken(result, res) {
 
 
 exports.get_company_purchased_orders = async function getCompanyPurchasedOrders(req, res, next) {
-  req.params.id=0;
+  req.params.id = 0;
 
   if (req.params.id != 0 && req.params.id != 1) {
     res.status(400).json({ success: false, error: "There needs to be a valid id" });
@@ -85,19 +85,76 @@ async function getPurchasedOrders(result, res) {
     .get(url + tenant + company + "/purchases/orders", {
       headers: {
         Authorization: `Bearer ${token}`,
-      "Content-Type": "x-www-form-urlencoded"
+        "Content-Type": "x-www-form-urlencoded"
       }
     })
     .then(response => {
-        let data = response.data;
-        res.status(200).json({ result: data });
-      })
-  .catch(error => {
-    //token might have expired or might not even exist so get new token and try again!
-    console.log("will try token");
-    getToken(result).then(response => {
-      result.token = response;
-      getPurchasedOrders(result, res);
+      let data = response.data;
+      res.status(200).json({ result: data });
+    })
+    .catch(error => {
+      //token might have expired or might not even exist so get new token and try again!
+      console.log("will try token");
+      getToken(result).then(response => {
+        result.token = response;
+        getPurchasedOrders(result, res);
+      });
     });
+}
+
+
+exports.get_companies_products = async function getCompanyProducts(req, res, next) {
+  req.params.id=1;
+
+  if (req.params.id != 0 && req.params.id != 1) {
+    res.status(400).json({ success: false, error: "There needs to be a valid id" });
+    return;
+  }
+
+  let params = [req.params.id];
+  db.all("SELECT * from company where id=$1", params, function (err, rows) {
+    if (err) {
+      res.status(400).json({ success: false, error: "Invalid query" });
+    }
+    else
+      rows.forEach(function (row) {
+        console.log(row);
+        getSalesProducts(row, res);
+      });
   });
+}
+
+
+async function getSalesProducts(result, res) {
+  let tenant = tenant_differ;
+  let company = token_differ;
+
+  if (result.id == 1) {
+    tenant = tenant_sinf;
+    company = token_sinf;
+  }
+
+  let token = result.token;
+  axios
+    .get(url + tenant + company + "salescore/salesitems", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "x-www-form-urlencoded"
+      }
+    })
+    .then(response => {
+      let data = response.data;
+      res.status(200).json({ result: data });
+    })
+    .catch(error => {
+      //console.log(error);
+      //token might have expired or might not even exist so get new token and try again!
+      console.log("will try token");
+      getToken(result).then(response => {
+        result.token = response;
+        getSalesProducts(result, res);
+      });
+
+    });
+
 }

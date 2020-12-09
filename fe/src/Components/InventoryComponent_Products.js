@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Row from 'react-bootstrap/Row'; 
+import Spinner from 'react-bootstrap/Spinner';
 import Table from 'react-bootstrap/Table';
 import './../CSS/Inventory.css';
 
@@ -48,7 +49,7 @@ class InventoryComponent_Products extends Component {
 
     render() {
         if(this.state.isLoading)
-            return(<h1>Loading...</h1>);
+            return(<Spinner animation="grow" />);
         else
             return (
                 <>

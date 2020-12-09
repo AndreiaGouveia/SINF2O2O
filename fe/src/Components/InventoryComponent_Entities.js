@@ -1,88 +1,138 @@
-import React from 'react';
+import React, { Component } from 'react';
 import Table from 'react-bootstrap/Table';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
+import Spinner from 'react-bootstrap/Spinner';
 import Row from 'react-bootstrap/Row';
 import './../CSS/Inventory.css';
 
 
-let customers = [
-    ["C1","226844006","916254053","customer1@yahoo.com"],
-    ["C2","264438065","937760225","customerHS@gmail.com"],
-    ["C3","224680375","913541355","gajofixe@sapo.pt"]
-];
 
-let retailers = [
-    ["S1","285269127","912056735","retailerA@gmail.com"],
-    ["S2","211433594","962381642","companyX@gmail.com"],
-    ["S3","243038097","933377234","anotherCompany@hotmail.com"]
-];
 
-function InventoryComponent_Entities () {
+class InventoryComponent_Entities extends Component {
 
-    return (
-        <>
-            <div id="company-dropdown">
-                <Row>
-                <label for="companies">Company</label>
-                </Row>
-                <Row> 
-                <select name="companies" id="companies">
-                    <option value="c1">C1</option>
-                    <option value="c2">C2</option>
-                </select>
-                </Row>
-            </div>
-            <Tabs defaultActiveKey="entities" id="entities">
-                <Tab eventKey="customers" title="Customers" default>
-                    <Table id="content-table" hover>
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            isLoading : true,
+            company : 0,
+            customer: 0,
+            data : []
+        }
+
+    }
+    
+    componentDidMount() {
+        console.log("hello");
+        const requestOptions = {
+            method: 'GET',
+        };
+
+        if(this.state.customer === 0)
+        {
+            fetch(`http://localhost:5000/company//entities/suppliers/${this.state.company}`, requestOptions)
+            .then((res) => (res.clone().text()))
+            .then((res) => (this.setState((prevState) => ({
+                isLoading: !prevState.isLoading,
+                data: JSON.parse(res).result,
+            }))));
+        }
+
+    }
+
+    changeCompany() {
+        let s = this.state.company;
+
+        s === 0 ? s=1 : s=0;
+
+        this.setState({
+            isLoading: true,
+            company: s
+        },function () {
+            this.componentDidMount();
+        });
+    }
+
+    render() {
+        if(this.state.isLoading)
+            return(<Spinner animation="grow" />);
+        else
+        return (
+            <>
+                <div id="company-dropdown">
+                    <Row>
+                    <label for="companies">Company</label>
+                    </Row>
+                    <Row> 
+                    <select name="companies" id="companies" onChange={this.changeCompany.bind(this)}>
+                            {(() => {
+                                if(this.state.company === 0) {
+                                    return (<><option value="c1">C1</option>
+                                            <option value="c2">C2</option></>);
+                                } else {
+                                    return (<><option value="c1">C1</option>
+                                            <option value="c2" selected="selected">C2</option></>);
+                                }
+                            })()}
+                        </select>
+                    </Row>
+                </div>
+                <Tabs defaultActiveKey="entities" id="entities">
+                    <Tab eventKey="customers" title="Customers" default>
+                        <Table id="content-table" hover>
+                            <thead>
+                                <tr>
+                                <th>Name</th>
+                                <th>TaxID</th>
+                                <th>Payment Method</th>
+                                <th>Telephone</th>
+                                <th>Email</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {this.state.data.map(supplier => (
+                                <tr>
+                                    <td>{supplier.name}</td>
+                                    <td>{supplier.companyTaxID}</td>
+                                    <td>{supplier.paymentMethod}</td>
+                                    <td>{supplier.telephone}</td>
+                                    <td>{supplier.email}</td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </Table>
+                    </Tab>
+                    <Tab eventKey="sellers" title="Sellers">
+                        <Table id="content-table" hover>
                         <thead>
-                            <tr>
-                            <th>ID</th>
-                            <th>VAT</th>
-                            <th>Phone</th>
-                            <th>Email</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {customers.map(customer => (
-                            <tr>
-                                <td>{customer[0]}</td>
-                                <td>{customer[1]}</td>
-                                <td>{customer[2]}</td>
-                                <td>{customer[3]}</td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </Table>
-                </Tab>
-                <Tab eventKey="sellers" title="Sellers">
-                    <Table id="content-table" hover>
-                        <thead>
-                            <tr>
-                            <th>ID</th>
-                            <th>VAT</th>
-                            <th>Phone</th>
-                            <th>Email</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {retailers.map(retailer => (
-                            <tr>
-                                <td>{retailer[0]}</td>
-                                <td>{retailer[1]}</td>
-                                <td>{retailer[2]}</td>
-                                <td>{retailer[3]}</td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </Table>
-                </Tab>
+                                <tr>
+                                <th>Name</th>
+                                <th>TaxID</th>
+                                <th>Payment Method</th>
+                                <th>Telephone</th>
+                                <th>Email</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {this.state.data.map(supplier => (
+                                <tr>
+                                    <td>{supplier.name}</td>
+                                    <td>{supplier.companyTaxID}</td>
+                                    <td>{supplier.paymentMethod}</td>
+                                    <td>{supplier.telephone}</td>
+                                    <td>{supplier.email}</td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </Table>
+                    </Tab>
+                    
+                </Tabs>
                 
-            </Tabs>
-            
-        </>
-    );
+            </>
+        );
+    }
 }
 
 export default InventoryComponent_Entities;

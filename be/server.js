@@ -3,11 +3,13 @@ const express = require('express');
 const path = require('path');
 const logger = require('morgan');
 const cors = require('cors');
+const app = express();
 
 const indexRouter = require('./routes/index');
 const companyRouter = require('./routes/companies');
+const transactionsRouter = require('./routes/transactions');
 
-const app = express();
+
 const port = process.env.PORT || 5000;
 
 // view engine setup
@@ -23,6 +25,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/company', companyRouter);
+app.use('/transaction', transactionsRouter);
+
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

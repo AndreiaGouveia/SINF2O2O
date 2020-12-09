@@ -47,37 +47,35 @@ const useStyles = makeStyles({
   table: {
     maxWidth: 1000,
   },
-}); 
-
-
+});
 
 class CreateOrder extends Component {
 
-constructor(props) {
-  super(props);
-this.state={
-  company:"",
-  name:"hai"
-};
-}
+  constructor(props) {
+    super(props);
+    this.state = {
+      company: "",
+      name: "hai"
+    };
+  }
 
 
   render() {
 
 
-    const handleChange=(event) => {    
+    const handleChange = (event) => {
       this.setState({
         name: this.state.name,
         steps: this.state.itemsForm,
-        open:false
-      });  
+        open: false
+      });
     };
     const handleClickOpen = () => {
-      this.setState({open: true});
+      this.setState({ open: true });
     };
 
     const handleClose = () => {
-      this.setState({open: false});
+      this.setState({ open: false });
     };
 
     return (
@@ -87,7 +85,7 @@ this.state={
         <Form id="form">
           <Form.Group id="row" as={Row} controlId="formPlaintextEmail">
             <Form.Label column sm="2">
-               Supplier
+              Supplier
             </Form.Label>
             <Col sm="10">
               <Select
@@ -107,7 +105,7 @@ this.state={
 
           <Form.Group id="rowproduct" as={Row} controlId="formPlaintextPassword">
             <Form.Label column sm="2">
-               Product
+              Product
             </Form.Label>
             <Col sm="10">
               <Button id="label" onClick={handleClickOpen}> Select your Product </Button>
@@ -124,7 +122,7 @@ this.state={
               <DialogTitle > Select your Product </DialogTitle>
               {<DialogContent>
                 <Table aria-label="customized table">
-                  <TableBody> { new TableProducts()} </TableBody>
+                  <TableBody> {new TableProducts()} </TableBody>
                 </Table>
               </DialogContent>}
               <DialogActions>
@@ -140,7 +138,7 @@ this.state={
           </Grid>
           <Form.Group id="row" as={Row} controlId="formPlaintextPassword">
             <Form.Label column sm="2">
-              Quantity 
+              Quantity
             </Form.Label>
             <Col sm="10">
               <TextField
@@ -156,7 +154,7 @@ this.state={
 
           <Form.Group id="row" as={Row} controlId="formPlaintextPassword">
             <Form.Label column sm="2">
-              Total 
+              Total
             </Form.Label>
             <Col sm="10">
               <Button id="label" disabled={true} variant="contained">Total</Button>
@@ -184,9 +182,9 @@ const subrows = [
   createsubData("P2", "3", "cat food"),
 ];
 
-class TableProducts extends Component{
-  /* classes = useStyles(); */
-render(){
+function TableProducts() {
+  /* const  classes = useStyles(); */
+
   return (
     <Table /* className={classes.table} */ aria-label="customized table">
       <TableHead>
@@ -229,7 +227,7 @@ render(){
       </TableBody>
     </Table>
   );
-}
+
 }
 
 export default CreateOrder;

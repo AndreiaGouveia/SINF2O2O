@@ -46,7 +46,7 @@ function Row(props) {
     <React.Fragment>
       <TableRow className={classes.root}>
         <TableCell id="min-col" align="center">
-          <IconButton  aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+          <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
@@ -111,33 +111,57 @@ const rows = [
 ];
 
 class Transactions extends Component {
-  render(){
-  return (
-    <TableContainer component={Paper}>
-      <Button id="transactions-label" disabled={true} variant="contained">Transactions</Button>
-      <Table id="collapsible-table" aria-label="collapsible table">
-        <TableHead>
-          <TableRow>
-            <TableCell id="min-col"  align="center">Status</TableCell>
-            <TableCell id="date-col" align="left">Date&nbsp;</TableCell>
-            <TableCell id="order-col" align="left">Order&nbsp;</TableCell>
-            <TableCell id="supplier-col" align="center">Supplier&nbsp;</TableCell>
-            <TableCell id="min-col" align="center">Value&nbsp;</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => (
-            <Row key={row.name} row={row} />
-          ))}
-        </TableBody>
-      </Table>
+  
+  constructor(props) {
+    super(props);
 
-      <Fab href="CreateOrder" color="primary" aria-label="add">
-        <AddIcon />
-      </Fab>
-    </TableContainer>
-  );
-}
+    this.state = {
+      data: []
+    }
+  }
+  componentDidMount() {
+    const requestOptions = {
+      method: 'GET',
+    };
+
+    fetch('http://localhost:5000/transaction/orders', requestOptions)
+      .then((res) => (res.clone().text()))
+      .then((res) => (this.setState((prevState) => ({
+        isLoading: !prevState.isLoading,
+        data: JSON.parse(res).result
+      }))));
+
+  }
+
+  render() {
+    console.log(this.state.data)
+
+    return (
+      <TableContainer component={Paper}>
+        <Button id="transactions-label" disabled={true} variant="contained">Transactions</Button>
+        <Table id="collapsible-table" aria-label="collapsible table">
+          <TableHead>
+            <TableRow>
+              <TableCell id="min-col" align="center">Status</TableCell>
+              <TableCell id="date-col" align="left">Date&nbsp;</TableCell>
+              <TableCell id="order-col" align="left">Order&nbsp;</TableCell>
+              <TableCell id="supplier-col" align="center">Supplier&nbsp;</TableCell>
+              <TableCell id="min-col" align="center">Value&nbsp;</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rows.map((row) => (
+              <Row row={row} />
+            ))}
+          </TableBody>
+        </Table>
+
+        <Fab href="CreateOrder" color="primary" aria-label="add">
+          <AddIcon />
+        </Fab>
+      </TableContainer>
+    );
+  }
 }
 
 export default Transactions;

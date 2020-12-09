@@ -219,7 +219,7 @@ function TableProducts(data) {
 
         {data.filter(aux => aux.itemKey != "PORTES").map((items) => {
           var item = items.itemKey;
-          var description = items.complementaryDescription;
+          var description = items.description;
           var value = items.priceListLines[0].priceAmount.amount + ' ' + items.priceListLines[0].priceAmount.symbol;
           /* console.log(item, value, description); */
           return (

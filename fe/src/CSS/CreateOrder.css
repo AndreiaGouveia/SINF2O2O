@@ -55,12 +55,13 @@
     color: teal !important;
 }
 
-#sub-buttons{
-    color: teal !important;
-}
-
 #header{
     background-color: teal !important;
+}
+
+#header1{
+    background-color: teal !important;
+    padding: 0 !important;
 }
 
 #cancel{
@@ -83,3 +84,6 @@
     color: white !important;
 }
 
+#check{
+    padding: 0 !important;
+}

@@ -19,6 +19,7 @@ import Grid from "@material-ui/core/Grid";
 import Form from 'react-bootstrap/Form'
 import { Col, Row } from "react-bootstrap";
 import { Component } from "react";
+import Typography from '@material-ui/core/Typography';
 
 
 
@@ -43,11 +44,7 @@ const StyledTableRow = withStyles((theme) => ({
 
 
 
-const useStyles = makeStyles({
-  table: {
-    maxWidth: 1000,
-  },
-});
+
 
 class CreateOrder extends Component {
 
@@ -67,7 +64,8 @@ class CreateOrder extends Component {
       this.setState({
         name: this.state.name,
         steps: this.state.itemsForm,
-        open: false
+        open: false,
+        value: ''
       });
     };
     const handleClickOpen = () => {
@@ -76,6 +74,15 @@ class CreateOrder extends Component {
 
     const handleClose = () => {
       this.setState({ open: false });
+    };
+
+    const onChange = e => {
+      //replace non-digits with blank
+      const value = e.target.value.replace(/[^\d]/, '');
+
+      if (parseInt(value) !== 0) {
+        this.setState({ value });
+      }
     };
 
     return (
@@ -98,7 +105,7 @@ class CreateOrder extends Component {
                 }}
               >
                 <option aria-label="None" value="" />
-                <option value={10}> C1 </option> <option value={20}> C2 </option>
+                <option value={10}> SINF </option>
               </Select>
             </Col>
           </Form.Group>
@@ -113,25 +120,23 @@ class CreateOrder extends Component {
           </Form.Group>
           <Grid container spacing={3}>
 
-            <Dialog
-              disableBackdropClick
-              disableEscapeKeyDown
-              open={this.open}
-              onClose={handleClose}
-            >
-              <DialogTitle > Select your Product </DialogTitle>
-              {<DialogContent>
+
+            <Dialog onClose={handleClose} aria-labelledby="customized-dialog-title" open={this.state.open}>
+              <DialogTitle> Select your Product </DialogTitle>
+
+              <DialogContent>
                 <Table aria-label="customized table">
-                  <TableBody> {new TableProducts()} </TableBody>
+                  <TableBody> {TableProducts()} </TableBody>
                 </Table>
-              </DialogContent>}
+              </DialogContent>
+
               <DialogActions>
-                <Button id="sub-buttons" onClick={handleClose} color="primary">
+                <Button autoFocus onClick={handleClose} color="">
                   Cancel
-                    </Button>
-                <Button id="sub-buttons" onClick={handleClose} color="primary">
-                  Ok
-                    </Button>
+          </Button>
+                <Button autoFocus onClick={handleClose} color="">
+                  Save
+          </Button>
               </DialogActions>
             </Dialog>
 
@@ -145,6 +150,8 @@ class CreateOrder extends Component {
                 id="outlined-number"
                 label="Number"
                 type="number"
+                value={this.state.value}
+                onChange={onChange}
                 InputLabelProps={{
                   shrink: true,
                 }}
@@ -182,14 +189,16 @@ const subrows = [
   createsubData("P2", "3", "cat food"),
 ];
 
+
+
 function TableProducts() {
-  /* const  classes = useStyles(); */
+
 
   return (
-    <Table /* className={classes.table} */ aria-label="customized table">
+    <Table aria-label="customized table">
       <TableHead>
         <TableRow>
-          <StyledTableCell id="header"> </StyledTableCell>
+          <StyledTableCell id="header1"> </StyledTableCell>
           <StyledTableCell id="header" align="center">
             Product Name
           </StyledTableCell>

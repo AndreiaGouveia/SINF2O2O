@@ -159,8 +159,7 @@ class Transactions extends Component {
                 var date = orders.createdOn.substring(0,19).replace("T"," ");
                 var order = orders.documentLines[0].quantity + 'x ' + orders.documentLines[0].description;
                 var supplier = orders.sellerSupplierPartyName;
-                var value = orders.payableAmount.amount + ' €';
-                console.log("que crlh se passa aqui:");
+                var value = orders.payableAmount.amount + ' ' + orders.payableAmount.symbol;
                 console.log(date, order, supplier, value);
                 return <Row row={createData(date, order, supplier, value)} />;
               })}

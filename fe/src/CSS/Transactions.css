@@ -45,8 +45,8 @@
 }
 
 #date-col{
-    padding: 0 !important;
-    max-width: 20px;
+    padding: 0 0 0 4px !important;
+    max-width: 30px;
 }
 
 #supplier-col{
@@ -55,7 +55,7 @@
 }
 
 #order-col{
-    padding-left: 0 !important;
+    padding-left: 4px !important;
     padding-right: 0 !important;
     max-width: 100px;
 }

@@ -104,18 +104,19 @@ Row.propTypes = {
   }).isRequired,
 };
 
-const rows = [
+/* const rows = [
   createData('15-09-2020', '1x P1', 'S1', 150),
   createData('03-09-2020', '50x P2', 'S3', 87),
   createData('20-10-2020', '5x P3', 'S3', 789),
-];
+]; */
 
 class Transactions extends Component {
-  
+
   constructor(props) {
     super(props);
 
     this.state = {
+      isLoading: true,
       data: []
     }
   }
@@ -134,33 +135,44 @@ class Transactions extends Component {
   }
 
   render() {
-    console.log(this.state.data)
+    if (this.state.isLoading) {
+      return (
+        <h1>I am loading</h1>
+      );
+    } else {
+      console.log(this.state.data)
+      return (
+        <TableContainer component={Paper}>
+          <Button id="transactions-label" disabled={true} variant="contained">Transactions</Button>
+          <Table id="collapsible-table" aria-label="collapsible table">
+            <TableHead>
+              <TableRow>
+                <TableCell id="min-col" align="center">Status</TableCell>
+                <TableCell id="date-col" align="left">Date/Time&nbsp;</TableCell>
+                <TableCell id="order-col" align="left">Order&nbsp;</TableCell>
+                <TableCell id="supplier-col" align="center">Supplier&nbsp;</TableCell>
+                <TableCell id="min-col" align="center">Value&nbsp;</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {this.state.data.map((orders) => {
+                var date = orders.createdOn.substring(0,19).replace("T"," ");
+                var order = orders.documentLines[0].quantity + 'x ' + orders.documentLines[0].description;
+                var supplier = orders.sellerSupplierPartyName;
+                var value = orders.payableAmount.amount + ' €';
+                console.log("que crlh se passa aqui:");
+                console.log(date, order, supplier, value);
+                return <Row row={createData(date, order, supplier, value)} />;
+              })}
+            </TableBody>
+          </Table>
 
-    return (
-      <TableContainer component={Paper}>
-        <Button id="transactions-label" disabled={true} variant="contained">Transactions</Button>
-        <Table id="collapsible-table" aria-label="collapsible table">
-          <TableHead>
-            <TableRow>
-              <TableCell id="min-col" align="center">Status</TableCell>
-              <TableCell id="date-col" align="left">Date&nbsp;</TableCell>
-              <TableCell id="order-col" align="left">Order&nbsp;</TableCell>
-              <TableCell id="supplier-col" align="center">Supplier&nbsp;</TableCell>
-              <TableCell id="min-col" align="center">Value&nbsp;</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => (
-              <Row row={row} />
-            ))}
-          </TableBody>
-        </Table>
-
-        <Fab href="CreateOrder" color="primary" aria-label="add">
-          <AddIcon />
-        </Fab>
-      </TableContainer>
-    );
+          <Fab href="CreateOrder" color="primary" aria-label="add">
+            <AddIcon />
+          </Fab>
+        </TableContainer>
+      );
+    }
   }
 }
 

@@ -10,7 +10,7 @@ function MainPage() {
         <>
             <div className="banner">
                 <div className="center">
-                    <h1>Wellcome!</h1>
+                    <h1>Welcome!</h1>
                 </div>
 
                 <div className="functionalities">

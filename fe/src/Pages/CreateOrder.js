@@ -19,7 +19,7 @@ import Grid from "@material-ui/core/Grid";
 import Form from 'react-bootstrap/Form'
 import { Col, Row } from "react-bootstrap";
 import { Component } from "react";
-import Typography from '@material-ui/core/Typography';
+import FormControl from '@material-ui/core/FormControl';
 
 
 
@@ -42,10 +42,6 @@ const StyledTableRow = withStyles((theme) => ({
 }))(TableRow);
 
 
-
-
-
-
 class CreateOrder extends Component {
 
   constructor(props) {
@@ -56,6 +52,8 @@ class CreateOrder extends Component {
       isLoading: true,
       data: []
     };
+    this.selectedCheckboxes = new Set();
+
   }
 
   componentDidMount() {
@@ -72,16 +70,16 @@ class CreateOrder extends Component {
 
   }
 
+
   render() {
-
-
 
     const handleChange = (event) => {
       this.setState({
         name: this.state.name,
         steps: this.state.itemsForm,
         open: false,
-        value: ''
+        value: '',
+        supplier: ''
       });
     };
     const handleClickOpen = () => {
@@ -89,8 +87,24 @@ class CreateOrder extends Component {
     };
 
     const handleClose = () => {
+      this.selectedCheckboxes.clear();
       this.setState({ open: false });
     };
+
+    const handleSave = () => {
+      console.log(this.selectedCheckboxes);
+      this.setState({ open: false });
+    };
+
+
+    const toggleCheckbox = id => {
+      if (this.selectedCheckboxes.has(id.target.id)) {
+        this.selectedCheckboxes.delete(id.target.id);
+      } else {
+        this.selectedCheckboxes.add(id.target.id);
+      }
+    };
+
 
     const onChange = e => {
       //replace non-digits with blank
@@ -112,9 +126,7 @@ class CreateOrder extends Component {
           <Button href="Transactions" id="cancel" variant="contained">Cancel</Button>
           <Form id="form">
             <Form.Group id="row" as={Row} controlId="formPlaintextEmail">
-              <Form.Label column sm="2">
-                Supplier
-            </Form.Label>
+              <Form.Label column sm="2">Supplier</Form.Label>
               <Col sm="10">
                 <Select
                   native
@@ -126,7 +138,7 @@ class CreateOrder extends Component {
                   }}
                 >
                   <option aria-label="None" value="" />
-                  <option value={10}> SINF </option>
+                  <option value={this.state.supplier}> SINF </option>
                 </Select>
               </Col>
             </Form.Group>
@@ -147,7 +159,53 @@ class CreateOrder extends Component {
 
                 <DialogContent>
                   <Table aria-label="customized table">
-                    <TableBody> {TableProducts(this.state.data)} </TableBody>
+                    <TableBody>
+                      <Table aria-label="customized table">
+                        <TableHead>
+                          <TableRow>
+                            <StyledTableCell id="header1"> </StyledTableCell>
+                            <StyledTableCell id="header" align="center">
+                              Product Name
+          </StyledTableCell>
+                            <StyledTableCell id="header" align="center"> Description </StyledTableCell>
+                            <StyledTableCell id="header" align="center"> Value/Un    </StyledTableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {this.state.data.filter(aux => aux.itemKey != "PORTES").map((items) => {
+                            var item = items.itemKey;
+                            var description = items.description;
+                            var value = items.priceListLines[0].priceAmount.amount + ' ' + items.priceListLines[0].priceAmount.symbol;
+                            /* console.log(item, value, description); */
+                            return (
+                              <StyledTableRow key={item}>
+                                <StyledTableCell id="check">
+                                  <FormControl component="fieldset">
+                                    <Checkbox
+                                      id={item}
+                                      color=""
+                                      inputProps={{ "aria-label": "checkbox" }}
+                                      value={{ item }}
+                                      onChange={toggleCheckbox}
+                                      defaultChecked={this.selectedCheckboxes.has(items.itemKey)}
+                                    />
+                                  </FormControl>
+                                </StyledTableCell>
+                                <StyledTableCell id="products" align="center">
+                                  {item}
+                                </StyledTableCell>
+                                <StyledTableCell id="products" align="center">
+                                  {description}
+                                </StyledTableCell>
+                                <StyledTableCell id="products" align="center">
+                                  {value}
+                                </StyledTableCell>
+                              </StyledTableRow>
+                            )
+                          })}
+                        </TableBody>
+                      </Table >
+                    </TableBody>
                   </Table>
                 </DialogContent>
 
@@ -155,7 +213,7 @@ class CreateOrder extends Component {
                   <Button autoFocus onClick={handleClose} color="">
                     Cancel
           </Button>
-                  <Button autoFocus onClick={handleClose} color="">
+                  <Button autoFocus onClick={handleSave} color="">
                     Save
           </Button>
                 </DialogActions>
@@ -188,63 +246,15 @@ class CreateOrder extends Component {
                 <Button id="label" disabled={true} variant="contained">Total</Button>
               </Col>
             </Form.Group>
-
+            <Button id="submit" variant="contained">Submit</Button>
           </Form>
-          <Button id="submit" variant="contained">Submit</Button>
+
 
         </Container>
       );
 
     }
   }
-}
-
-
-function TableProducts(data) {
-
-
-  return (
-    <Table aria-label="customized table">
-      <TableHead>
-        <TableRow>
-          <StyledTableCell id="header1"> </StyledTableCell>
-          <StyledTableCell id="header" align="center">
-            Product Name
-          </StyledTableCell>
-          <StyledTableCell id="header" align="center"> Description </StyledTableCell>
-          <StyledTableCell id="header" align="center"> Value/Un    </StyledTableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-
-        {data.filter(aux => aux.itemKey != "PORTES").map((items) => {
-          var item = items.itemKey;
-          var description = items.description;
-          var value = items.priceListLines[0].priceAmount.amount + ' ' + items.priceListLines[0].priceAmount.symbol;
-          /* console.log(item, value, description); */
-          return (
-          <StyledTableRow key={item}>
-            <StyledTableCell id="check">
-              <Checkbox
-                color=""
-                inputProps={{ "aria-label": "checkbox" }}
-              />
-            </StyledTableCell>
-            <StyledTableCell id="products" align="center">
-              {item}
-            </StyledTableCell>
-            <StyledTableCell id="products" align="center">
-              {description}
-            </StyledTableCell>
-            <StyledTableCell id="products" align="center">
-              {value}
-            </StyledTableCell>
-          </StyledTableRow>)
-        })}
-      </TableBody>
-    </Table>
-  );
-
 }
 
 export default CreateOrder;

@@ -104,11 +104,6 @@ Row.propTypes = {
   }).isRequired,
 };
 
-/* const rows = [
-  createData('15-09-2020', '1x P1', 'S1', 150),
-  createData('03-09-2020', '50x P2', 'S3', 87),
-  createData('20-10-2020', '5x P3', 'S3', 789),
-]; */
 
 class Transactions extends Component {
 
@@ -155,7 +150,7 @@ class Transactions extends Component {
               </TableRow>
             </TableHead>
             <TableBody>
-              {this.state.data.map((orders) => {
+              {this.state.data.filter(aux => aux.documentTypeDescription == "Encomenda a fornecedor").map((orders) => {
                 var date = orders.createdOn.substring(0,19).replace("T"," ");
                 var order = orders.documentLines[0].quantity + 'x ' + orders.documentLines[0].description;
                 var supplier = orders.sellerSupplierPartyName;

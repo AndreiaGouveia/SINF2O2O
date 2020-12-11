@@ -10,7 +10,6 @@ import CreateOrder from './Pages/CreateOrder';
 
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 
-setInterval(function () { alert("Hello"); }, 3000);
 ReactDOM.render(
   <React.StrictMode>
     <Router>

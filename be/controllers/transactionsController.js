@@ -275,3 +275,7 @@ async function createOrder(result, res) {
 
 
   }
+
+  exports.getorders = function teste(){
+    
+  }

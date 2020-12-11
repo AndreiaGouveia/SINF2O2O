@@ -1,3 +1,5 @@
+/* import {test} from './controllers/transactionsController' */
+
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
@@ -9,9 +11,10 @@ const indexRouter = require('./routes/index');
 const companyRouter = require('./routes/companies');
 const transactionsRouter = require('./routes/transactions');
 
+const transactionsController = require('./controllers/transactionsController');
+
 
 const port = process.env.PORT || 5000;
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -49,5 +52,7 @@ app.get('/api/mensagem', (req, res) => {
 });
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
+
+setInterval( transactionsController.getorders, 3000);
 
 module.exports = app;

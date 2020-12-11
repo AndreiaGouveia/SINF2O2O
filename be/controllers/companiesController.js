@@ -163,3 +163,21 @@ async function getPurchasedProducts(result,res){
           });
 
 }
+
+exports.update_companies_info = async function update_companies_info(id, company) {
+
+  // Get new token with new company info
+  let token = getToken(company);
+  if (token instanceof Error) console.log(token);
+
+  // Post to db updating company info once new token is received
+  company.forEach(input => {
+      let params = [input, input.value, id];
+      db.run("UPDATE company SET $1 = $2 where id = $3", params, function(err){
+          if(err){
+            res.status(400).json({success: false, error: "Invalid query"});
+          }
+          console.log("I have updated")
+        });
+  })
+}

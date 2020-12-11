@@ -20,6 +20,7 @@ import Form from 'react-bootstrap/Form'
 import { Col, Row } from "react-bootstrap";
 import { Component } from "react";
 import FormControl from '@material-ui/core/FormControl';
+import axios from 'axios';
 
 
 
@@ -47,7 +48,7 @@ class CreateOrder extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      company: "",
+      company: "loles",
       name: "hai",
       isLoading: true,
       data: []
@@ -96,6 +97,21 @@ class CreateOrder extends Component {
       this.setState({ open: false });
     };
 
+    const handleSubmit = async (event) => {
+      event.preventDefault();
+      console.log("TOU AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII");
+      const requestOptions = {
+        method: 'POST',
+      };
+      try {
+        await axios.post('http://localhost:5000/transaction/createorder', requestOptions);
+      } catch (error) {
+        return error;
+      }
+
+
+    }
+
 
     const toggleCheckbox = id => {
       if (this.selectedCheckboxes.has(id.target.id)) {
@@ -114,6 +130,14 @@ class CreateOrder extends Component {
         this.setState({ value });
       }
     };
+
+
+    /*   submitHandler = (event) => {
+        event.preventDefault();
+        
+      } */
+
+
     if (this.state.isLoading) {
       return (
         <h1>I am loading</h1>
@@ -124,7 +148,7 @@ class CreateOrder extends Component {
         <Container id="container">
           <Button id="createOrder-label" disabled={true} variant="contained">Create Order</Button>
           <Button href="Transactions" id="cancel" variant="contained">Cancel</Button>
-          <Form id="form">
+          <Form /* onSubmit ={this.submitHandler}  */ onSubmit={handleSubmit} id="form">
             <Form.Group id="row" as={Row} controlId="formPlaintextEmail">
               <Form.Label column sm="2">Supplier</Form.Label>
               <Col sm="10">
@@ -246,7 +270,7 @@ class CreateOrder extends Component {
                 <Button id="label" disabled={true} variant="contained">Total</Button>
               </Col>
             </Form.Group>
-            <Button id="submit" variant="contained">Submit</Button>
+            <Button id="submit" type="submit" variant="contained">Submit</Button>
           </Form>
 
 

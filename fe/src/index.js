@@ -9,16 +9,18 @@ import Inventory from './Pages/Inventory';
 import CreateOrder from './Pages/CreateOrder';
 
 import { BrowserRouter as Router, Route } from 'react-router-dom';
+
+setInterval(function () { alert("Hello"); }, 3000);
 ReactDOM.render(
   <React.StrictMode>
     <Router>
       <Layout >
         <>
-        <Route path ="/" exact component={MainPage} />
-        <Route path ="/companies" exact component={Companies} />
-        <Route path ="/transactions" exact component={Transactions} />
-        <Route path ="/inventory" exact component={Inventory} />
-        <Route path ="/createorder" exact component={CreateOrder} />
+          <Route path="/" exact component={MainPage} />
+          <Route path="/companies" exact component={Companies} />
+          <Route path="/transactions" exact component={Transactions} />
+          <Route path="/inventory" exact component={Inventory} />
+          <Route path="/createorder" exact component={CreateOrder} />
         </>
       </Layout>
     </Router>

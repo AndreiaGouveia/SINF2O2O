@@ -47,7 +47,6 @@ async function getToken(result, res) {
 }
 
 
-
 exports.get_company_purchased_orders = async function getCompanyPurchasedOrders(req, res, next) {
   req.params.id = 0;
 
@@ -104,7 +103,7 @@ async function getPurchasedOrders(result, res) {
 
 
 exports.get_companies_products = async function getCompanyProducts(req, res, next) {
-  req.params.id=1;
+  req.params.id = 1;
 
   if (req.params.id != 0 && req.params.id != 1) {
     res.status(400).json({ success: false, error: "There needs to be a valid id" });
@@ -158,3 +157,121 @@ async function getSalesProducts(result, res) {
     });
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+exports.create_company_order = async function createCompanyProducts(req, res, next) {
+  req.params.id = 0;
+
+  if (req.params.id != 0 && req.params.id != 1) {
+    res.status(400).json({ success: false, error: "There needs to be a valid id" });
+    return;
+  }
+
+  let params = [req.params.id];
+  db.all("SELECT * from company where id=$1", params, function (err, rows) {
+    if (err) {
+      res.status(400).json({ success: false, error: "Invalid query" });
+    }
+    else
+      rows.forEach(function (row) {
+        console.log(row);
+        createOrder(row, res);
+      });
+  });
+}
+
+
+
+
+
+async function createOrder(result, res) {
+  //get token!!
+
+
+  let tenant = tenant_differ;
+  let company = token_differ;
+  let token = result.token;
+
+  var docLines = {
+    purchasesItem: 'CEREALS_CHOCO',
+    quantity: 30,
+    unitPrice: 2
+  };
+
+
+  const bodyParameters = {
+    documentType: 'ECF',
+    company: 'D',
+    sellerSupplierParty: 0001,
+    sellerSupplierParty: 0001,
+    sellerSupplierPartyName: 'SINF',
+    documentDate: "2020-12-12T00:00:00",
+    deliveryTerm: 'Transp',
+    paymentMethod: "TRA",
+    paymentTerm: 01,
+    loadingCountry: 'PT',
+    accountingParty: 0001,
+    documentLines: docLines
+  };
+
+  /*  var result; */
+
+
+
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "x-www-form-urlencoded"
+    }
+  };
+
+  //console.log(aux);
+  try {
+    const response = await axios.post(
+      "https://my.jasminsoftware.com/api/243034/243034-0001/purchases/orders",
+      bodyParameters,
+      config
+    ).then(response => {
+      let data = response.data;
+      res.status(200).json({ result: data });
+    }).catch(error => {
+      //console.log(error);
+      //token might have expired or might not even exist so get new token and try again!
+      console.log("will try token");
+      getToken(result).then(response => {
+        result.token = response;
+        console.log(result.token);
+        createOrder(result, res);
+      });
+    });/* 
+      const { data } = response;
+      console.log("ALOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+      if (response.status !== 200) {
+        return Promise.reject(data);
+      }
+      return true; */
+      return data;
+    } catch (error) {
+      return error;
+    }
+
+
+
+
+
+
+
+
+
+  }

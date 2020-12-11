@@ -53,6 +53,6 @@ app.get('/api/mensagem', (req, res) => {
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
 
-setInterval( transactionsController.getorders, 3000);
+setInterval( transactionsController.getorders, 10000);
 
 module.exports = app;

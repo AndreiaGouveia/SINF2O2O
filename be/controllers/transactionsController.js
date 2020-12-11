@@ -156,19 +156,7 @@ async function getSalesProducts(result, res) {
 
     });
 
-}
-
-
-
-
-
-
-
-
-
-
-
-
+} 
 
 exports.create_company_order = async function createCompanyProducts(req, res, next) {
   req.params.id = 0;
@@ -190,10 +178,6 @@ exports.create_company_order = async function createCompanyProducts(req, res, ne
       });
   });
 }
-
-
-
-
 
 async function createOrder(result, res) {
   //get token!!
@@ -266,16 +250,125 @@ async function createOrder(result, res) {
       return error;
     }
 
-
-
-
-
-
-
-
-
   }
 
-  exports.getorders = function teste(){
+  ////////////////////////////////////////// New Structure ////////////////////////////////////////////
+
+  exports.getorders = async function teste(){
+    //get database info
+    let params = ['purchased'];
+
+      db.all("SELECT id, state from companyOrder where type=$1", params, function (err, rows) {
+        if (err) {
+          console.log("i am error :'(" + err);
+        }
+        else{
+          console.log("I AM ALIVE")
+          let idsList = [];
+          rows.forEach(element => {
+            idsList.push(element.id);
+          })
+          handleDatabaseResponse(rows,idsList);
+        }
+      });
+  }
+
+  async function handleDatabaseResponse(response,idsList){
+    //o get orders e o check status of orders can be done simulaniously!
+    console.log("im got reply")
+    console.log(response);
+
+    //getOrders();
+    getOrders(response,idsList);
+
+    //checking status of our orders
+    checkStatus(response);
+
+    //compareOrdes
+
+    //-> if new 
+      // insert new orders(database) and create new sale order in jasmin (sinf) -- ter em conta que já pode estar tratado
     
+    // check status of each order!
+    //have a handler to see which status and ask jasmin the respective solution and alter the status  
+  }
+
+  async function checkStatus(response){
+    console.log("I am inside check status");
+    response.forEach(element => {
+      console.log(element);
+    });
+  }
+
+  async function getOrders(orders,idsList) {
+  
+    db.all("SELECT * from company where id=0", function (err, rows) {
+      if (err) {
+        console.log("Invalid query" );
+        return;//doesnt do anything
+      }
+      else {
+        getOrdersPurchased(rows[0] , orders,idsList);
+      }
+    });
+  }
+
+  async function getOrdersPurchased(companyInfo , orders, idsList) {
+  
+    let token = companyInfo.token;
+  
+    axios
+      .get(url + tenant_differ + token_differ + "/purchases/orders", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "x-www-form-urlencoded"
+        }
+      })
+      .then(response => {
+        let data = response.data;
+        compareOrders(data,orders,idsList);
+      })
+      .catch(error => {
+        //token might have expired or might not even exist so get new token and try again!
+        console.log("will try token");
+        getToken(companyInfo).then(response => {
+          companyInfo.token = response;
+          getOrdersPurchased(companyInfo, orders,idsList);
+        });
+      });
+  }
+
+  async function compareOrders(jasminOrders,orders,idsLists){
+    console.log("im on compareOrders");
+    console.log("ids list");
+    console.log(idsLists);
+
+    jasminOrders.forEach(element => {
+      if(idsLists.includes(element.id)){
+        console.log("I already exist");  
+      }
+      else{ 
+        //temos de adicionar salesorders na sinf() e adicionar essa salesorder na bd.
+        console.log("I dont exist");  
+        insertNewOrderToDB(element.id);
+        addNewOrderToSeller(element);
+      }
+    });
+  }
+
+  async function insertNewOrderToDB(orderID){
+    //add order on sql
+    // insert one row into the langs table
+    db.run(`INSERT INTO companyOrder(id,state,type) VALUES(?,?,?)`, [orderID,1,'purchased'], function(err) {
+      if (err) {
+        return console.log(err.message);
+      }
+      // get the last insert id
+      console.log(`A row has been inserted`);
+    });
+  }
+
+  async function addNewOrderToSeller(order){
+    //post to sinf
+    //todo
   }

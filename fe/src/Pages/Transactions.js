@@ -132,7 +132,10 @@ class Transactions extends Component {
   render() {
     if (this.state.isLoading) {
       return (
-        <h1>I am loading</h1>
+        <>
+          <h1>I am loading</h1>
+          <h1>{ (new Date()).toISOString}</h1>
+        </>
       );
     } else {
       console.log(this.state.data)

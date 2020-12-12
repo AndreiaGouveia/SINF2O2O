@@ -6,7 +6,9 @@ const token_sinf = "243035-0001/";
 const url = "https://my.jasminsoftware.com/api/";
 const axios = require("axios");
 const db = require("../database/database");
+var format = require('date-format');
 var FormData = require("form-data");
+const fetch = require("node-fetch");
 
 
 
@@ -343,6 +345,9 @@ async function compareOrders(jasminOrders, orders, idsLists) {
   console.log("ids list");
   console.log(idsLists);
 
+
+  addOrderToSeller(jasminOrders[0])
+
   jasminOrders.forEach(element => {
     if (idsLists.includes(element.id)) {
       console.log("I already exist");
@@ -351,7 +356,6 @@ async function compareOrders(jasminOrders, orders, idsLists) {
       //temos de adicionar salesorders na sinf() e adicionar essa salesorder na bd.
       console.log("I dont exist");
       insertNewOrderToDB(element.id);
-      addOrder(element)
     }
   });
 }
@@ -368,7 +372,12 @@ async function insertNewOrderToDB(orderID) {
   });
 }
 
-async function addOrder(order) {
+async function addOrderToSeller(order) {
+
+  //post to sinf
+  //todo
+
+  //get SINF token 
 
   db.all("SELECT * from company where id=1", function (err, rows) {
     if (err) {
@@ -376,137 +385,68 @@ async function addOrder(order) {
       return;//doesnt do anything
     }
     else {
-      console.log(rows[0]);
-      addNewOrderToSeller(rows[0], order);
-    }
-  });
+      console.log(rows)
+      getToken(rows[0])
+      .then(result => {
 
-}
+        let token = result;
+        console.log(token);
 
+        let orders = [];
+        order.documentLines.forEach( element => {
+          orders.push({
+            salesItem: element.purchasesItem,
+            quantity: element.quantity,
+            unitPrice: { amount: element.unitPrice.amount } 
+          })
+        })
 
+        console.log(orders)
+        let doc ={
+          documentType: "ECL",
+          serie: 2020,
+          documentDate: "2020-12-31T12:17:53.534Z",
+          buyerCustomerParty: "0001",
+          discount: 0,
+          currency: "EUR",
+          paymentMethod: "NUM",
+          company: "SINF",
+          deliveryOnInvoice: false,
+          documentLines: orders
+        }
 
-async function addNewOrderToSeller(companyInfo, order) {
-  //post to sinf
-  //todo
+        console.log("presenting order spec...")
+        console.log(JSON.stringify(doc));
+        //console.log(doc);
 
-  let token = companyInfo.token;
- 
-  console.log(companyInfo.token);
+        let headers = {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        };
 
-  console.log(order);
-
-  /* const config = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "x-www-form-urlencoded"
-    } */
-  //};
-  /* 
-    try {
-      console.log("making post");
-      const response = await axios.post(
-        "https://my.jasminsoftware.com/api/243035/243035-0001/sales/orders",
-        order,
-        config
-      ).then(response => {
-        let data = response.data;
-        res.status(200).json({ result: data });
-      }).catch(error => {
-        //console.log(error);
-        //token might have expired or might not even exist so get new token and try again!
-        console.log("try token");
-        getToken(companyInfo).then(response => {
-          companyInfo.token = response;
-          addNewOrderToSeller(companyInfo, order);
-        });
-      });/* 
-          const { data } = response;
-          if (response.status !== 200) {
-            return Promise.reject(data);
+        fetch("https://my.jasminsoftware.com/api/243035/243035-0001/sales/orders", {
+          method: "POST", // *GET, POST, PUT, DELETE, etc.
+          mode: "cors", // no-cors, *cors, same-origin
+          cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          referrerPolicy: "no-referrer", // no-referrer, *client
+          body: JSON.stringify(doc) // body data type must match "Content-Type" header
+        }).then(
+          response => {
+            console.log(response);
           }
-          return true; //
-  
-  
-      return data;
-    } catch (error) {
-      return error;
-    } */
+        ).catch(function() {
+          console.log("error");
+      });
 
-
-/*                                     convert function                                          */ 
-
-  var objectToFormData = function (obj, form, namespace) {
-
-    var fd = form || new FormData();
-    var formKey;
-
-    for (var property in obj) {
-      if (obj.hasOwnProperty(property)) {
-
-        if (namespace) {
-          formKey = namespace + '[' + property + ']';
-        } else {
-          formKey = property;
-        }
-
-        // if the property is an object, but not a File,
-        // use recursivity.
-        if (typeof obj[property] === 'object' && !(obj[property] instanceof File)) {
-
-          objectToFormData(obj[property], fd, property);
-
-        } else {
-
-          // if it's a string or a File object
-          fd.append(formKey, obj[property]);
-        }
-
-      }
+      })
     }
-
-    return fd;
-
-  };
-
-  var z = objectToFormData({
-    obj: order,
-    arr: [
-      'one',
-      'two',
-      'three',
-      new File([''], '')
-    ],
-    file: new File([''], '')
   });
 
-  console.log("APÓS CONVERSÃO" + z);
+  
 
-
-/*     ............................................................................................................... */
-
-
-
-
-  let headers = {
-    'Authorization': `Bearer ` + token,
-    //"Content-Type": "x-www-form-urlencoded"
-  };
-
-  const resPost = await axios.post(url + tenant_sinf + token_sinf + "sales/orders", order,
-    {
-      headers
-    })
-    .then(response => {
-      let data = response.data;
-      res.status(200).json({ result: data });
-    })
-    .catch(error => {
-      console.log(error);
-      //token might have expired or might not even exist so get new token and try again!
-      console.log("try token");
-      getToken(companyInfo).then(response => {
-        companyInfo.token = response;
-        addNewOrderToSeller(companyInfo, order);
-      });
-    });
 }

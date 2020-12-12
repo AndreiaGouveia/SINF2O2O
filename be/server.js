@@ -5,6 +5,7 @@ const express = require('express');
 const path = require('path');
 const logger = require('morgan');
 const cors = require('cors');
+const bodyParser = require("body-parser");
 const app = express();
 
 const indexRouter = require('./routes/index');
@@ -18,6 +19,9 @@ const port = process.env.PORT || 5000;
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
+
+// Parse incoming requests data
+app.use(bodyParser.json());
 
 app.use(cors());
 app.options('*', cors());
@@ -53,6 +57,6 @@ app.get('/api/mensagem', (req, res) => {
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
 
-setInterval( transactionsController.getorders, 10000);
+setInterval( transactionsController.getorders, 30000);
 
 module.exports = app;

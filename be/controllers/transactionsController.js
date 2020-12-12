@@ -385,12 +385,12 @@ async function addOrderToSeller(order) {
       return;//doesnt do anything
     }
     else {
-      console.log(rows)
+      //console.log(rows)
       getToken(rows[0])
       .then(result => {
 
         let token = result;
-        console.log(token);
+        //console.log(token);
 
         let orders = [];
         order.documentLines.forEach( element => {
@@ -425,22 +425,20 @@ async function addOrderToSeller(order) {
         };
 
         fetch("https://my.jasminsoftware.com/api/243035/243035-0001/sales/orders", {
-          method: "POST", // *GET, POST, PUT, DELETE, etc.
-          mode: "cors", // no-cors, *cors, same-origin
-          cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+          method: "POST", 
           headers: {
             "Content-Type": "application/json",
             Authorization: "Bearer " + token
-            // 'Content-Type': 'application/x-www-form-urlencoded',
           },
-          referrerPolicy: "no-referrer", // no-referrer, *client
+          referrerPolicy: "no-referrer",
           body: JSON.stringify(doc) // body data type must match "Content-Type" header
-        }).then(
-          body => {
-            console.log("im hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
-            console.log(body);
-          }
-        ).catch(function() {
+        }).then(function(res) {
+          return res.json();
+      }).then(function(json) {
+        console.log("I AM RESPONSE")
+        //add to database!!! and UPDATE STATE TO 2
+          console.log(json);
+      }).catch(function() {
           console.log("error");
       });
 

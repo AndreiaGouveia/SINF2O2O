@@ -406,7 +406,7 @@ async function addOrderToSeller(order) {
           documentType: "ECL",
           serie: 2020,
           documentDate: "2020-12-31T12:17:53.534Z",
-          buyerCustomerParty: "0001",
+          buyerCustomerParty: "INDIF",
           discount: 0,
           currency: "EUR",
           paymentMethod: "NUM",
@@ -436,8 +436,9 @@ async function addOrderToSeller(order) {
           referrerPolicy: "no-referrer", // no-referrer, *client
           body: JSON.stringify(doc) // body data type must match "Content-Type" header
         }).then(
-          response => {
-            console.log(response);
+          body => {
+            console.log("im hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
+            console.log(body);
           }
         ).catch(function() {
           console.log("error");

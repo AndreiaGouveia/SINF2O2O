@@ -156,7 +156,7 @@ async function getSalesProducts(result, res) {
 
     });
 
-} 
+}
 
 exports.create_company_order = async function createCompanyProducts(req, res, next) {
   req.params.id = 0;
@@ -245,130 +245,268 @@ async function createOrder(result, res) {
         return Promise.reject(data);
       }
       return true; */
+    return data;
+  } catch (error) {
+    return error;
+  }
+
+}
+
+////////////////////////////////////////// New Structure ////////////////////////////////////////////
+
+exports.getorders = async function teste() {
+  //get database info
+  let params = ['purchased'];
+
+  db.all("SELECT id, state from companyOrder where type=$1", params, function (err, rows) {
+    if (err) {
+      console.log("i am error :'(" + err);
+    }
+    else {
+      console.log("I AM ALIVE")
+      let idsList = [];
+      rows.forEach(element => {
+        idsList.push(element.id);
+      })
+      handleDatabaseResponse(rows, idsList);
+    }
+  });
+}
+
+async function handleDatabaseResponse(response, idsList) {
+  //o get orders e o check status of orders can be done simulaniously!
+  console.log("im got reply")
+  console.log(response);
+
+  //getOrders();
+  getOrders(response, idsList);
+
+  //checking status of our orders
+  checkStatus(response);
+
+  //compareOrdes
+
+  //-> if new 
+  // insert new orders(database) and create new sale order in jasmin (sinf) -- ter em conta que já pode estar tratado
+
+  // check status of each order!
+  //have a handler to see which status and ask jasmin the respective solution and alter the status  
+}
+
+async function checkStatus(response) {
+  console.log("I am inside check status");
+  response.forEach(element => {
+    console.log(element);
+  });
+}
+
+async function getOrders(orders, idsList) {
+
+  db.all("SELECT * from company where id=0", function (err, rows) {
+    if (err) {
+      console.log("Invalid query");
+      return;//doesnt do anything
+    }
+    else {
+      getOrdersPurchased(rows[0], orders, idsList);
+    }
+  });
+}
+
+async function getOrdersPurchased(companyInfo, orders, idsList) {
+
+  let token = companyInfo.token;
+
+  axios
+    .get(url + tenant_differ + token_differ + "/purchases/orders", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "x-www-form-urlencoded"
+      }
+    })
+    .then(response => {
+      let data = response.data;
+      compareOrders(data, orders, idsList);
+    })
+    .catch(error => {
+      //token might have expired or might not even exist so get new token and try again!
+      console.log("will try token");
+      getToken(companyInfo).then(response => {
+        companyInfo.token = response;
+        getOrdersPurchased(companyInfo, orders, idsList);
+      });
+    });
+}
+
+async function compareOrders(jasminOrders, orders, idsLists) {
+  console.log("im on compareOrders");
+  console.log("ids list");
+  console.log(idsLists);
+
+  jasminOrders.forEach(element => {
+    if (idsLists.includes(element.id)) {
+      console.log("I already exist");
+    }
+    else {
+      //temos de adicionar salesorders na sinf() e adicionar essa salesorder na bd.
+      console.log("I dont exist");
+      insertNewOrderToDB(element.id);
+      addOrder(element)
+    }
+  });
+}
+
+async function insertNewOrderToDB(orderID) {
+  //add order on sql
+  // insert one row into the langs table
+  db.run(`INSERT INTO companyOrder(id,state,type) VALUES(?,?,?)`, [orderID, 1, 'purchased'], function (err) {
+    if (err) {
+      return console.log(err.message);
+    }
+    // get the last insert id
+    console.log(`A row has been inserted`);
+  });
+}
+
+async function addOrder(order) {
+
+  db.all("SELECT * from company where id=1", function (err, rows) {
+    if (err) {
+      console.log("Invalid query");
+      return;//doesnt do anything
+    }
+    else {
+      console.log(rows[0]);
+      addNewOrderToSeller(rows[0], order);
+    }
+  });
+
+}
+
+
+
+async function addNewOrderToSeller(companyInfo, order) {
+  //post to sinf
+  //todo
+
+  let token = companyInfo.token;
+ 
+  console.log(companyInfo.token);
+
+  console.log(order);
+
+  /* const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "x-www-form-urlencoded"
+    } */
+  //};
+  /* 
+    try {
+      console.log("making post");
+      const response = await axios.post(
+        "https://my.jasminsoftware.com/api/243035/243035-0001/sales/orders",
+        order,
+        config
+      ).then(response => {
+        let data = response.data;
+        res.status(200).json({ result: data });
+      }).catch(error => {
+        //console.log(error);
+        //token might have expired or might not even exist so get new token and try again!
+        console.log("try token");
+        getToken(companyInfo).then(response => {
+          companyInfo.token = response;
+          addNewOrderToSeller(companyInfo, order);
+        });
+      });/* 
+          const { data } = response;
+          if (response.status !== 200) {
+            return Promise.reject(data);
+          }
+          return true; //
+  
+  
       return data;
     } catch (error) {
       return error;
+    } */
+
+
+/*                                     convert function                                          */ 
+
+  var objectToFormData = function (obj, form, namespace) {
+
+    var fd = form || new FormData();
+    var formKey;
+
+    for (var property in obj) {
+      if (obj.hasOwnProperty(property)) {
+
+        if (namespace) {
+          formKey = namespace + '[' + property + ']';
+        } else {
+          formKey = property;
+        }
+
+        // if the property is an object, but not a File,
+        // use recursivity.
+        if (typeof obj[property] === 'object' && !(obj[property] instanceof File)) {
+
+          objectToFormData(obj[property], fd, property);
+
+        } else {
+
+          // if it's a string or a File object
+          fd.append(formKey, obj[property]);
+        }
+
+      }
     }
 
-  }
+    return fd;
 
-  ////////////////////////////////////////// New Structure ////////////////////////////////////////////
+  };
 
-  exports.getorders = async function teste(){
-    //get database info
-    let params = ['purchased'];
+  var z = objectToFormData({
+    obj: order,
+    arr: [
+      'one',
+      'two',
+      'three',
+      new File([''], '')
+    ],
+    file: new File([''], '')
+  });
 
-      db.all("SELECT id, state from companyOrder where type=$1", params, function (err, rows) {
-        if (err) {
-          console.log("i am error :'(" + err);
-        }
-        else{
-          console.log("I AM ALIVE")
-          let idsList = [];
-          rows.forEach(element => {
-            idsList.push(element.id);
-          })
-          handleDatabaseResponse(rows,idsList);
-        }
+  console.log("APÓS CONVERSÃO" + z);
+
+
+/*     ............................................................................................................... */
+
+
+
+
+  let headers = {
+    'Authorization': `Bearer ` + token,
+    //"Content-Type": "x-www-form-urlencoded"
+  };
+
+  const resPost = await axios.post(url + tenant_sinf + token_sinf + "sales/orders", order,
+    {
+      headers
+    })
+    .then(response => {
+      let data = response.data;
+      res.status(200).json({ result: data });
+    })
+    .catch(error => {
+      console.log(error);
+      //token might have expired or might not even exist so get new token and try again!
+      console.log("try token");
+      getToken(companyInfo).then(response => {
+        companyInfo.token = response;
+        addNewOrderToSeller(companyInfo, order);
       });
-  }
-
-  async function handleDatabaseResponse(response,idsList){
-    //o get orders e o check status of orders can be done simulaniously!
-    console.log("im got reply")
-    console.log(response);
-
-    //getOrders();
-    getOrders(response,idsList);
-
-    //checking status of our orders
-    checkStatus(response);
-
-    //compareOrdes
-
-    //-> if new 
-      // insert new orders(database) and create new sale order in jasmin (sinf) -- ter em conta que já pode estar tratado
-    
-    // check status of each order!
-    //have a handler to see which status and ask jasmin the respective solution and alter the status  
-  }
-
-  async function checkStatus(response){
-    console.log("I am inside check status");
-    response.forEach(element => {
-      console.log(element);
     });
-  }
-
-  async function getOrders(orders,idsList) {
-  
-    db.all("SELECT * from company where id=0", function (err, rows) {
-      if (err) {
-        console.log("Invalid query" );
-        return;//doesnt do anything
-      }
-      else {
-        getOrdersPurchased(rows[0] , orders,idsList);
-      }
-    });
-  }
-
-  async function getOrdersPurchased(companyInfo , orders, idsList) {
-  
-    let token = companyInfo.token;
-  
-    axios
-      .get(url + tenant_differ + token_differ + "/purchases/orders", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "x-www-form-urlencoded"
-        }
-      })
-      .then(response => {
-        let data = response.data;
-        compareOrders(data,orders,idsList);
-      })
-      .catch(error => {
-        //token might have expired or might not even exist so get new token and try again!
-        console.log("will try token");
-        getToken(companyInfo).then(response => {
-          companyInfo.token = response;
-          getOrdersPurchased(companyInfo, orders,idsList);
-        });
-      });
-  }
-
-  async function compareOrders(jasminOrders,orders,idsLists){
-    console.log("im on compareOrders");
-    console.log("ids list");
-    console.log(idsLists);
-
-    jasminOrders.forEach(element => {
-      if(idsLists.includes(element.id)){
-        console.log("I already exist");  
-      }
-      else{ 
-        //temos de adicionar salesorders na sinf() e adicionar essa salesorder na bd.
-        console.log("I dont exist");  
-        insertNewOrderToDB(element.id);
-        addNewOrderToSeller(element);
-      }
-    });
-  }
-
-  async function insertNewOrderToDB(orderID){
-    //add order on sql
-    // insert one row into the langs table
-    db.run(`INSERT INTO companyOrder(id,state,type) VALUES(?,?,?)`, [orderID,1,'purchased'], function(err) {
-      if (err) {
-        return console.log(err.message);
-      }
-      // get the last insert id
-      console.log(`A row has been inserted`);
-    });
-  }
-
-  async function addNewOrderToSeller(order){
-    //post to sinf
-    //todo
-  }
+}

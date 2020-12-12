@@ -9,4 +9,8 @@ router.get('/salesitems', transactionsController.get_companies_products);
 
 router.post('/createorder', transactionsController.create_company_order);
 
+
+
+/* router.post('/newSalesOrder', transactionsController.add_NewOrder_To_Seller); */
+
 module.exports = router;

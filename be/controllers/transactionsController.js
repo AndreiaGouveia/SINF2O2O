@@ -342,20 +342,20 @@ async function getOrdersPurchased(companyInfo, orders, idsList) {
 
 async function compareOrders(jasminOrders, orders, idsLists) {
   console.log("im on compareOrders");
-  console.log("ids list");
-  console.log(idsLists);
 
 
-  addOrderToSeller(jasminOrders[0])
+  //addOrderToSeller(jasminOrders[0])
 
   jasminOrders.forEach(element => {
     if (idsLists.includes(element.id)) {
       console.log("I already exist");
+
     }
     else {
       //temos de adicionar salesorders na sinf() e adicionar essa salesorder na bd.
       console.log("I dont exist");
       insertNewOrderToDB(element.id);
+      addOrderToSeller(element);
     }
   });
 }
@@ -401,12 +401,11 @@ async function addOrderToSeller(order) {
           })
         })
 
-        console.log(orders)
         let doc ={
           documentType: "ECL",
           serie: 2020,
           documentDate: "2020-12-31T12:17:53.534Z",
-          buyerCustomerParty: "INDIF",
+          buyerCustomerParty: "0001",
           discount: 0,
           currency: "EUR",
           paymentMethod: "NUM",
@@ -414,15 +413,6 @@ async function addOrderToSeller(order) {
           deliveryOnInvoice: false,
           documentLines: orders
         }
-
-        console.log("presenting order spec...")
-        console.log(JSON.stringify(doc));
-        //console.log(doc);
-
-        let headers = {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        };
 
         fetch("https://my.jasminsoftware.com/api/243035/243035-0001/sales/orders", {
           method: "POST", 
@@ -433,11 +423,12 @@ async function addOrderToSeller(order) {
           referrerPolicy: "no-referrer",
           body: JSON.stringify(doc) // body data type must match "Content-Type" header
         }).then(function(res) {
+          console.log("done processing");
           return res.json();
-      }).then(function(json) {
-        console.log("I AM RESPONSE")
-        //add to database!!! and UPDATE STATE TO 2
-          console.log(json);
+        }).then(function(json) {
+          console.log("I AM RESPONSE")
+          //add to database!!! and UPDATE STATE TO 2
+          addSaleToDatabase(json , order.id)
       }).catch(function() {
           console.log("error");
       });
@@ -447,5 +438,27 @@ async function addOrderToSeller(order) {
   });
 
   
+
+}
+
+async function addSaleToDatabase(saleOrderID , orderID ){
+
+  console.log("...... sale order id ........");
+  console.log(saleOrderID)
+  console.log("...... jasmin order id ........");
+  console.log(orderID)
+
+  let data = [saleOrderID, orderID];
+  let sql = `UPDATE companyOrder
+              SET sellerId = ? , state = 2
+              WHERE id = ?`;
+
+  db.run(sql, data, function(err) {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log(`Row(s) updated`);
+
+  });
 
 }

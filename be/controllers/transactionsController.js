@@ -349,7 +349,6 @@ async function compareOrders(jasminOrders, orders, idsLists) {
   jasminOrders.forEach(element => {
     if (idsLists.includes(element.id)) {
       console.log("I already exist");
-
     }
     else {
       //temos de adicionar salesorders na sinf() e adicionar essa salesorder na bd.
@@ -369,6 +368,7 @@ async function insertNewOrderToDB(orderID) {
     }
     // get the last insert id
     console.log(`A row has been inserted`);
+    log(orderID,"INITIATED_PURCHASE_ORDER");
   });
 }
 
@@ -458,7 +458,27 @@ async function addSaleToDatabase(saleOrderID , orderID ){
       return console.error(err.message);
     }
     console.log(`Row(s) updated`);
+    log(orderID,"CREATED_SALES_ORDER");
 
   });
 
+}
+
+async function log(orderID , message){
+
+  console.log("-----order id ........");
+  console.log(orderID)
+  console.log("-----message  ........");
+  console.log(message)
+
+  let data = [orderID, message];
+  let sql = `INSERT INTO messages(order_id,message) VALUES(?,?)`;
+
+  db.run(sql, data, function(err) {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log(`Row(s) updated`);
+
+  });
 }

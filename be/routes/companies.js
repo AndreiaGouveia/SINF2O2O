@@ -10,5 +10,6 @@ router.get('/products/purchased/:id', companyController.get_companies_purchased_
 router.get('/companiesInfo',  companyController.get_companies_info);
 router.get('/warehouses/:id', companyController.get_warehouses);
 router.get('/entities/suppliers/:id', companyController.get_suppliers);
+router.get('/entities/customers/:id', companyController.get_customers);
 
 module.exports = router;

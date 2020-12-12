@@ -20,7 +20,6 @@ class InventoryComponent_Warehouses extends Component {
     }
     
     componentDidMount() {
-        console.log("hello");
         const requestOptions = {
             method: 'GET',
         };
@@ -50,7 +49,7 @@ class InventoryComponent_Warehouses extends Component {
 
     render() {
         if(this.state.isLoading)
-            return(<Spinner animation="grow" />);
+            return(<div id="Spinner"><Spinner animation="grow" /></div>);
         else
             return (
                 <>

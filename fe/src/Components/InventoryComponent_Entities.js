@@ -18,26 +18,31 @@ class InventoryComponent_Entities extends Component {
             isLoading : true,
             company : 0,
             customer: 0,
-            data : []
+            seller_data : [],
+            customer_data : []
         }
 
     }
     
     componentDidMount() {
-        console.log("hello");
         const requestOptions = {
             method: 'GET',
         };
 
-        if(this.state.customer === 0)
-        {
-            fetch(`http://localhost:5000/company//entities/suppliers/${this.state.company}`, requestOptions)
-            .then((res) => (res.clone().text()))
-            .then((res) => (this.setState((prevState) => ({
-                isLoading: !prevState.isLoading,
-                data: JSON.parse(res).result,
-            }))));
-        }
+        
+        fetch(`http://localhost:5000/company/entities/suppliers/${this.state.company}`, requestOptions)
+        .then((res) => (res.clone().text()))
+        .then((res) => (this.setState((prevState) => ({
+            seller_data: JSON.parse(res).result,
+        }))));
+
+        fetch(`http://localhost:5000/company/entities/customers/${this.state.company}`, requestOptions)
+        .then((res) => (res.clone().text()))
+        .then((res) => (this.setState((prevState) => ({
+            isLoading: !prevState.isLoading,
+            customer_data: JSON.parse(res).result,
+        }))));
+        
 
     }
 
@@ -56,7 +61,7 @@ class InventoryComponent_Entities extends Component {
 
     render() {
         if(this.state.isLoading)
-            return(<Spinner animation="grow" />);
+            return(<div id="Spinner"><Spinner animation="grow" /></div>);
         else
         return (
             <>
@@ -79,7 +84,7 @@ class InventoryComponent_Entities extends Component {
                     </Row>
                 </div>
                 <Tabs defaultActiveKey="entities" id="entities">
-                    <Tab eventKey="customers" title="Customers" default>
+                    <Tab eventKey="suppliers" title="Suppliers" default>
                         <Table id="content-table" hover>
                             <thead>
                                 <tr>
@@ -91,7 +96,7 @@ class InventoryComponent_Entities extends Component {
                                 </tr>
                             </thead>
                             <tbody>
-                            {this.state.data.map(supplier => (
+                            {this.state.seller_data.map(supplier => (
                                 <tr>
                                     <td>{supplier.name}</td>
                                     <td>{supplier.companyTaxID}</td>
@@ -103,25 +108,23 @@ class InventoryComponent_Entities extends Component {
                             </tbody>
                         </Table>
                     </Tab>
-                    <Tab eventKey="sellers" title="Sellers">
+                    <Tab eventKey="customers" title="Customers">
                         <Table id="content-table" hover>
                         <thead>
                                 <tr>
-                                <th>Name</th>
-                                <th>TaxID</th>
-                                <th>Payment Method</th>
-                                <th>Telephone</th>
-                                <th>Email</th>
+                                    <th>Key</th>
+                                    <th>Name</th>
+                                    <th>Telephone</th>
+                                    <th>Email</th>
                                 </tr>
                             </thead>
                             <tbody>
-                            {this.state.data.map(supplier => (
+                            {this.state.customer_data.map(customer => (
                                 <tr>
-                                    <td>{supplier.name}</td>
-                                    <td>{supplier.companyTaxID}</td>
-                                    <td>{supplier.paymentMethod}</td>
-                                    <td>{supplier.telephone}</td>
-                                    <td>{supplier.email}</td>
+                                    <td>{customer.key}</td>
+                                    <td>{customer.name}</td>
+                                    <td>{customer.telephone}</td>
+                                    <td>{customer.email}</td>
                                 </tr>
                             ))}
                             </tbody>

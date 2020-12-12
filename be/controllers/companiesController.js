@@ -24,7 +24,6 @@ exports.get_companies_products = async function getCompanyProducts(req, res, nex
       }
       else
         rows.forEach(function (row) {
-          console.log(row);
           getSalesProducts(row , res);
         }); 
       }); 
@@ -45,7 +44,6 @@ exports.get_companies_purchased_products = async function getCompanyPurchasedPro
     }
     else
       rows.forEach(function (row) {
-        console.log(row);
         getPurchasedProducts(row , res);
       }); 
     }); 
@@ -75,7 +73,6 @@ exports.get_warehouses = async function getCompanyWarehouses(req, res, next){
     }
     else
       rows.forEach(function (row) {
-        console.log(req.params.id);
         getWarehouses(row, res);
       }); 
   });
@@ -94,12 +91,28 @@ exports.get_suppliers = async function getCompanySuppliers(req, res, next) {
     }
     else
       rows.forEach(function (row) {
-        console.log(req.params.id);
         getSuppliers(row, res);
       }); 
   });
 }
    
+exports.get_customers = async function getCompanyCustomers(req, res, next) {
+  if(req.params.id != 0 && req.params.id != 1){
+    res.status(400).json({success: false, error: "There needs to be a valid id"});
+    return;
+  }
+
+  let params = [req.params.id];
+  db.all("SELECT * from company where id=$1",params, function(err,rows){
+    if(err){
+      res.status(400).json({success: false, error: "Invalid query"});
+    }
+    else
+      rows.forEach(function (row) {
+        getCustomers(row, res);
+      }); 
+  });
+}
 
 
 async function getToken(result,res){
@@ -159,7 +172,6 @@ async function getSalesProducts(result,res){
             res.status(200).json({ success: true, result: data });
           })
           .catch(error => {
-              //console.log(error);
               //token might have expired or might not even exist so get new token and try again!
               console.log("will try token");
               getToken(result).then(response => {
@@ -210,7 +222,6 @@ async function getPurchasedProducts(result,res){
       res.status(200).json({ success: true, result: data });
     })
     .catch(error => {
-      //console.log(error);
       //token might have expired or might not even exist so get new token and try again!
       console.log("will try token");
       getToken(result).then(response => {
@@ -221,7 +232,6 @@ async function getPurchasedProducts(result,res){
 }
 
 async function getWarehouses(result, res) {
-  console.log(result);
   let tenant = tenant_differ;
   let company = token_differ;
 
@@ -229,7 +239,7 @@ async function getWarehouses(result, res) {
     tenant = tenant_sinf;
     company = token_sinf;
   }
-//https://my.jasminsoftware.com/api/243034/243034-0001/materialscore/warehouses/
+  
   let token = result.token;
   axios
     .get(url + tenant + company + "materialscore/warehouses/", {
@@ -277,7 +287,7 @@ function getSuppliers(result, res) {
     tenant = tenant_sinf;
     company = token_sinf;
   }
-//https://my.jasminsoftware.com/api/243034/243034-0001/materialscore/warehouses/
+
   let token = result.token;
   axios
     .get(url + tenant + company + "purchasesCore/SupplierParties/", {
@@ -317,6 +327,58 @@ function filterSuppliers(data) {
       'name' : ub.name,
       'companyTaxID' : companyTaxID,
       'paymentMethod' : ub.paymentMethod,
+      'telephone' : telephone,
+      'email' : electronicMail
+    });
+  });
+
+  return result;
+}
+
+function getCustomers(result, res) {
+  let tenant = tenant_differ;
+  let company = token_differ;
+
+  if(result.id == 1){
+    tenant = tenant_sinf;
+    company = token_sinf;
+  }
+
+  let token = result.token;
+  axios
+    .get(url + tenant + company + "salescore/customerparties/", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "x-www-form-urlencoded"
+      }
+    })
+    .then(response => {
+      let data = filterCustomers(response.data);
+      res.status(200).json({ success: true, result: data });
+    })
+    .catch(error => {
+      //token might have expired or might not even exist so get new token and try again!
+      console.log("will try token");
+      getToken(result).then(response => {
+        result.token = response;
+        getCustomers(result , res);
+      });
+    });
+}
+
+function filterCustomers(data) {
+  let result = [];
+
+  let telephone;
+  let electronicMail;
+
+  data.forEach(ub => {
+    ub.telephone == null ? telephone="n/a" : telephone = ub.telephone;
+    ub.electronicMail == null ? electronicMail="n/a" : electronicMail = ub.electronicMail;
+
+    result.push({
+      'key' : ub.partyKey,
+      'name' : ub.name,
       'telephone' : telephone,
       'email' : electronicMail
     });

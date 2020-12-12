@@ -19,7 +19,6 @@ class InventoryComponent_Products extends Component {
     }
     
     componentDidMount() {
-        console.log("hello");
         const requestOptions = {
             method: 'GET',
         };
@@ -30,8 +29,6 @@ class InventoryComponent_Products extends Component {
             isLoading: !prevState.isLoading,
             data: JSON.parse(res).result,
         }))));
-
-
     }
 
     changeCompany() {
@@ -49,7 +46,7 @@ class InventoryComponent_Products extends Component {
 
     render() {
         if(this.state.isLoading)
-            return(<Spinner animation="grow" />);
+            return(<div id="Spinner"><Spinner animation="grow" /></div>);
         else
             return (
                 <>

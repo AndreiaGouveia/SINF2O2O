@@ -10,7 +10,11 @@ function MainPage() {
         <>
             <div className="banner">
                 <div className="center">
+<<<<<<< HEAD
                     <h1>Welcome</h1>
+=======
+                    <h1>Welcome!</h1>
+>>>>>>> inventory-page
                 </div>
 
                 <div className="functionalities">
@@ -20,7 +24,7 @@ function MainPage() {
                     </div>
                     <div className="func">
                         <VscSettingsGear />
-                        <h2>Manage Your Products</h2>
+                        <h2>Manage Your Inventory</h2>
                     </div>
                     <div className="func">
                         <IoSyncSharp />

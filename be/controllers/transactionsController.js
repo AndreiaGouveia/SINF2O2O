@@ -286,7 +286,7 @@ async function getAllInvoices(companyInfo, salesOrders) {
     })
     .catch(error => {
       //token might have expired or might not even exist so get new token and try again!
-      console.log("will try token");
+      console.log("An Error has occured: Will try token");
       getToken(companyInfo).then(response => {
         companyInfo.token = response;
         getAllInvoices(companyInfo, salesOrders);
@@ -297,7 +297,7 @@ async function getAllInvoices(companyInfo, salesOrders) {
 
 
 async function compareIdwithInvoice(data, salesOrders) {
-  console.log("im check invoices");
+  console.log("Checking available invoices...");
 
 
   //addOrderToSeller(jasminOrders[0])

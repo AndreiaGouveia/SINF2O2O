@@ -51,7 +51,6 @@ async function getToken(result, res) {
 
 
 exports.get_company_purchased_orders = async function getCompanyPurchasedOrders(req, res, next) {
-  console.log("hellloooo");
 
   db.all("SELECT * from company where id=0", function (err, rows) {
     if (err) {
@@ -66,8 +65,7 @@ exports.get_company_purchased_orders = async function getCompanyPurchasedOrders(
 }
 
 async function getPurchasedOrders(result, res) {
-  console.log("IM ON PURCHASED ORDERS");
-  console.log(result);
+  console.log("Getting purchased orders...");
   let tenant = tenant_differ;
   let company = token_differ;
 
@@ -87,12 +85,12 @@ async function getPurchasedOrders(result, res) {
     })
     .then(response => {
 
-      console.log("dataaaaaaaaaaa");
+      console.log("Received purchased orders");
       getOrdersBD(res,response.data);
     })
     .catch(error => {
       //token might have expired or might not even exist so get new token and try again!
-      console.log("will try token getPurchasedOrders");
+      console.log("An error occured - Will try token getPurchasedOrders");
       getToken(result).then(response => {
         result.token = response;
         getPurchasedOrders(result, res);
@@ -107,18 +105,44 @@ async function getOrdersBD(res, data){
     }
     else{
       let responseData = [];
-      rows.forEach(function (row) {
-        let index = data.findIndex(dat => dat.id === row.order_id);
-        if(index!=-1){
-          if(data[index].documentTypeDescription === "Encomenda a fornecedor")
-          responseData.push({...{message : row.message , date : row.date}, ...{
-                    date1 : data[index].createdOn.substring(0,19).replace("T"," "),
-                    order: data[index].documentLines[0].quantity + 'x ' + data[index].documentLines[0].description,
-                    supplier : data[index].sellerSupplierPartyName,
-                    value : data[index].payableAmount.amount + ' ' + data[index].payableAmount.symbol
-                }});
+      let tempData = [];
+      let temp = [];
+      temp.push({message: rows[0].message , date: rows[0].date})
+
+      // ver o caso do array so ter uma mensagem
+
+      for(let i = 1; i< rows.length;i++){
+        if(rows[i-1].order_id !== rows[i].order_id ){
+          //push old id
+          tempData.push({order: rows[i-1].order_id , logs : temp});
+          //clean data
+          temp = [];
+          //put new data
+          temp.push({message: rows[i].message , date: rows[i].date});
+        }else{
+          //push message to current id
+          temp.push({message: rows[i].message , date: rows[i].date});
         }
-      });
+
+        if(i == rows.length-1) {
+          tempData.push({order: rows[i-1].order_id , logs : temp});
+        }
+      }
+
+      //group 
+      for(let i = 0; i<tempData.length ; i++){
+        let index = data.findIndex(dat => dat.id === tempData[i].order);
+        if(index!=-1){
+            //new 
+            if(data[index].documentTypeDescription === "Encomenda a fornecedor" && index != -1)
+              responseData.push({...{messages: tempData[i].logs}, ...{
+                date1 : data[index].createdOn.substring(0,19).replace("T"," "),
+                order: data[index].documentLines[0].quantity + 'x ' + data[index].documentLines[0].description,
+                supplier : data[index].sellerSupplierPartyName,
+                value : data[index].payableAmount.amount + ' ' + data[index].payableAmount.symbol
+              }});  
+        }
+      }
       res.status(200).json({ result: responseData });
     }
   });
@@ -140,7 +164,6 @@ exports.get_companies_products = async function getCompanyProducts(req, res, nex
     }
     else
       rows.forEach(function (row) {
-        console.log(row);
         getSalesProducts(row, res);
       });
   });
@@ -171,7 +194,7 @@ async function getSalesProducts(result, res) {
     .catch(error => {
       console.log(error);
       //token might have expired or might not even exist so get new token and try again!
-      console.log("will try token getSalesProducts");
+      console.log("An error occured - Will try token getSalesProducts");
       getToken(result).then(response => {
         result.token = response;
         getSalesProducts(result, res);
@@ -196,7 +219,6 @@ exports.create_company_order = async function createCompanyProducts(req, res, ne
     }
     else
       rows.forEach(function (row) {
-        console.log(row);
         createOrder(row, res);
       });
   });
@@ -243,7 +265,6 @@ async function createOrder(result, res) {
     }
   };
 
-  //console.log(aux);
   try {
     const response = await axios.post(
       "https://my.jasminsoftware.com/api/243034/243034-0001/purchases/orders",
@@ -253,21 +274,14 @@ async function createOrder(result, res) {
       let data = response.data;
       res.status(200).json({ result: data });
     }).catch(error => {
-      //console.log(error);
       //token might have expired or might not even exist so get new token and try again!
-      console.log("will try token createOrder");
+      console.log("An error occured - Will try token createOrder");
       getToken(result).then(response => {
         result.token = response;
-        console.log(result.token);
+        console.log("Got a new token!!");
         createOrder(result, res);
       });
-    });/* 
-      const { data } = response;
-      console.log("ALOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
-      if (response.status !== 200) {
-        return Promise.reject(data);
-      }
-      return true; */
+    });
     return data;
   } catch (error) {
     return error;
@@ -283,10 +297,9 @@ exports.getorders = async function teste() {
 
   db.all("SELECT id, state from companyOrder where type=$1", params, function (err, rows) {
     if (err) {
-      console.log("i am error :'(" + err);
+      console.log("Error: " + err);
     }
     else {
-      console.log("I AM ALIVE")
       let idsList = [];
       rows.forEach(element => {
         idsList.push(element.id);
@@ -308,14 +321,14 @@ async function handleDatabaseResponse(response, idsList) {
 }
 
 async function checkStatus(response) {
-  console.log("I am inside check status");
+  console.log("Checking status");
 }
 
 async function getOrders(orders, idsList) {
 
   db.all("SELECT * from company where id=0", function (err, rows) {
     if (err) {
-      console.log("Invalid query");
+      console.log("Error: Invalid query");
       return;//doesnt do anything
     }
     else {
@@ -341,7 +354,7 @@ async function getOrdersPurchased(companyInfo, orders, idsList) {
     })
     .catch(error => {
       //token might have expired or might not even exist so get new token and try again!
-      console.log("will try token getOrdersPurchased");
+      console.log("An error occured - Will try token getOrdersPurchased");
       getToken(companyInfo).then(response => {
         companyInfo.token = response;
         getOrdersPurchased(companyInfo, orders, idsList);
@@ -350,7 +363,7 @@ async function getOrdersPurchased(companyInfo, orders, idsList) {
 }
 
 async function compareOrders(jasminOrders, orders, idsLists) {
-  console.log("im on compareOrders");
+  console.log("Comparing orders.... ");
 
 
   //addOrderToSeller(jasminOrders[0])
@@ -360,11 +373,13 @@ async function compareOrders(jasminOrders, orders, idsLists) {
     }
     else {
       //temos de adicionar salesorders na sinf() e adicionar essa salesorder na bd.
-      console.log("I dont exist");
+      console.log("Inserting new element...");
       insertNewOrderToDB(element.id);
       addOrderToSeller(element);
     }
   });
+
+  console.log("Finnished comparing orders!")
 }
 
 async function insertNewOrderToDB(orderID) {
@@ -375,7 +390,7 @@ async function insertNewOrderToDB(orderID) {
       return console.log(err.message);
     }
     // get the last insert id
-    console.log(`A row has been inserted`);
+    console.log("Finnished inserting order in database, creating log... ");
     log(orderID,"INITIATED_PURCHASE_ORDER");
   });
 }
@@ -389,16 +404,14 @@ async function addOrderToSeller(order) {
 
   db.all("SELECT * from company where id=1", function (err, rows) {
     if (err) {
-      console.log("Invalid query");
+      console.log("Error: Invalid query");
       return;//doesnt do anything
     }
     else {
-      //console.log(rows)
       getToken(rows[0])
       .then(result => {
 
         let token = result;
-        //console.log(token);
 
         let orders = [];
         order.documentLines.forEach( element => {
@@ -431,10 +444,9 @@ async function addOrderToSeller(order) {
           referrerPolicy: "no-referrer",
           body: JSON.stringify(doc) // body data type must match "Content-Type" header
         }).then(function(res) {
-          console.log("done processing");
           return res.json();
         }).then(function(json) {
-          console.log("I AM RESPONSE")
+          console.log("Adding sale order to database...")
           //add to database!!! and UPDATE STATE TO 2
           addSaleToDatabase(json , order.id)
       }).catch(function() {
@@ -465,7 +477,7 @@ async function addSaleToDatabase(saleOrderID , orderID ){
     if (err) {
       return console.error(err.message);
     }
-    console.log(`Row(s) updated`);
+    console.log("Added sales order to database");
     log(orderID,"CREATED_SALES_ORDER");
 
   });
@@ -486,7 +498,7 @@ async function log(orderID , message){
     if (err) {
       return console.error(err.message);
     }
-    console.log(`Row(s) updated`);
+    console.log("Inserted new log!");
 
   });
 }

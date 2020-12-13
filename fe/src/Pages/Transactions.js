@@ -27,17 +27,10 @@ const useRowStyles = makeStyles({
   },
 });
 
-function createData(date, order, supplier, value) {
-  console.log(date)
-  console.log(order)
-  console.log(supplier)
-  console.log(value)
+function createData(date, order, supplier, value , messages) {
   return {
     date, order, supplier, value,
-    status: [
-      { company: 'C1', date: '16:35:43 24-02-2020', message: "REJECTED_NO_STOCK" },
-      { company: 'C2', date: '16:30:12 24-02-2020', message: "INITIATE_ORDER" },
-    ],
+    status: messages,
   };
 }
 
@@ -66,17 +59,13 @@ function Row(props) {
               <Table size="small" aria-label="purchases">
                 <TableHead>
                   <TableRow>
-                    <TableCell id="sub-table-header" align="center">Company</TableCell>
                     <TableCell id="sub-table-header" align="center">Date</TableCell>
                     <TableCell id="sub-table-header" align="center">Message</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {row.status.map((statusRow) => (
-                    <TableRow key={statusRow.company}>
-                      <TableCell id="sub-table" align="center" component="th" scope="row">
-                        {statusRow.company}
-                      </TableCell>
+                    <TableRow>
                       <TableCell id="sub-table" align="center">{statusRow.date}</TableCell>
                       <TableCell id="sub-table" align="center">{statusRow.message}</TableCell>
                     </TableRow>
@@ -158,7 +147,7 @@ class Transactions extends Component {
             </TableHead>
             <TableBody>
               {
-                this.state.data.map(element => (<Row row={createData(element.date1, element.order, element.supplier, element.value)} />)) 
+                this.state.data.map(element => (<Row row={createData(element.date1, element.order, element.supplier, element.value, element.messages)} />)) 
               }
             </TableBody>
           </Table>

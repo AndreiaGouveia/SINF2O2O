@@ -281,7 +281,7 @@ exports.getorders = async function teste() {
   //get database info
   let params = ['purchased'];
 
-  db.all("SELECT id, state from companyOrder where type=$1", params, function (err, rows) {
+  db.all("SELECT id, state, sellerId from companyOrder where type=$1", params, function (err, rows) {
     if (err) {
       console.log("i am error :'(" + err);
     }
@@ -307,9 +307,183 @@ async function handleDatabaseResponse(response, idsList) {
 
 }
 
+
+///////////////////// Invoices ///////////////////////////////////////////
 async function checkStatus(response) {
-  console.log("I am inside check status");
+
+  let salesOrders = [];
+
+  console.log("----------------------------------------I am inside check status");
+  response.forEach(element => {
+    if (element.state == 2) {
+      salesOrders.push(element.sellerId)
+    }
+
+    //console.log(element);
+  });
+
+  console.log("ORDERS WITH STATUS 2");
+  console.log(salesOrders);
+
+  getInvoices(salesOrders);
 }
+
+
+async function getInvoices(salesOrders) {
+
+  db.all("SELECT * from company where id=1", function (err, rows) {
+    if (err) {
+      console.log("Invalid query");
+      return;//doesnt do anything
+    }
+    else {
+      getAllInvoices(rows[0], salesOrders);
+    }
+  });
+}
+
+
+async function getAllInvoices(companyInfo, salesOrders) {
+  let token = companyInfo.token;
+
+  axios
+    .get(url + tenant_sinf + token_sinf + "billing/invoices", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "x-www-form-urlencoded"
+      }
+    })
+    .then(response => {
+      let data = response.data;
+      compareIdwithInvoice(data, salesOrders);
+    })
+    .catch(error => {
+      //token might have expired or might not even exist so get new token and try again!
+      console.log("will try token");
+      getToken(companyInfo).then(response => {
+        companyInfo.token = response;
+        getAllInvoices(companyInfo, salesOrders);
+      });
+    });
+}
+
+
+
+async function compareIdwithInvoice(data, salesOrders) {
+  console.log("im check invoices");
+
+
+  //addOrderToSeller(jasminOrders[0])
+
+  data.forEach(element => {
+    if (salesOrders.includes(element.sourceDocId)) {
+      updateState3Db(element.sourceDocId);
+      createInvoice(element);
+    }
+  });
+}
+
+
+
+
+async function createInvoice(invoice) {
+  db.all("SELECT * from company where id=0", function (err, rows) {
+    if (err) {
+      console.log("Invalid query");
+      return;//doesnt do anything
+    }
+    else {
+      //console.log(rows)
+      getToken(rows[0])
+        .then(result => {
+
+          let token = result;
+          //console.log(token);
+
+          let orders = [];
+          invoice.documentLines.forEach(element => {
+            orders.push({
+              purchasesItem: element.salesItem,
+              quantity: element.quantity,
+              unitPrice: { amount: element.unitPrice.amount }
+            })
+          })
+
+          let doc = {
+            documentType: "VFA",
+            serie: 2020,
+            documentDate: "2020-12-31T12:17:53.534Z",
+            buyerCustomerParty: "0001",
+            discount: 0,
+            currency: "EUR",
+            paymentMethod: "NUM",
+            company: "SINF",
+            deliveryOnInvoice: false,
+            documentLines: orders
+          }
+
+          fetch("https://my.jasminsoftware.com/api/243034/243034-0001/invoiceReceipt/invoices", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token
+            },
+            referrerPolicy: "no-referrer",
+            body: JSON.stringify(doc) // body data type must match "Content-Type" header
+          }).then(function (res) {
+            console.log("done processing");
+            /* return res.json(); */
+            updateState4Db(invoice.sourceDocId);
+          }).catch(function () {
+            console.log("error");
+          });
+
+        })
+    }
+  });
+
+}
+
+
+async function updateState3Db(orderId){
+  console.log("...... update state 3........");
+
+  let data = [orderId];
+  let sql = `UPDATE companyOrder
+              SET state = 3
+              WHERE id = ?`;
+
+  db.run(sql, data, function (err) {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log(`Row(s) updated`);
+    log(orderID, "CREATING_INVOICE");
+
+  });
+}
+
+
+async function updateState4Db(orderId){
+  console.log("...... update state 4........");
+
+  let data = [orderId];
+  let sql = `UPDATE companyOrder
+              SET state = 4
+              WHERE id = ?`;
+
+  db.run(sql, data, function (err) {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log(`Row(s) updated`);
+    log(orderID, "ORDER_COMPLETED");
+
+  });
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////
 
 async function getOrders(orders, idsList) {
 
@@ -329,7 +503,7 @@ async function getOrdersPurchased(companyInfo, orders, idsList) {
   let token = companyInfo.token;
 
   axios
-    .get(url + tenant_differ + token_differ + "/purchases/orders", {
+    .get(url + tenant_differ + token_differ + "purchases/orders", {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "x-www-form-urlencoded"
@@ -376,7 +550,7 @@ async function insertNewOrderToDB(orderID) {
     }
     // get the last insert id
     console.log(`A row has been inserted`);
-    log(orderID,"INITIATED_PURCHASE_ORDER");
+    log(orderID, "INITIATED_PURCHASE_ORDER");
   });
 }
 
@@ -395,61 +569,61 @@ async function addOrderToSeller(order) {
     else {
       //console.log(rows)
       getToken(rows[0])
-      .then(result => {
+        .then(result => {
 
-        let token = result;
-        //console.log(token);
+          let token = result;
+          //console.log(token);
 
-        let orders = [];
-        order.documentLines.forEach( element => {
-          orders.push({
-            salesItem: element.purchasesItem,
-            quantity: element.quantity,
-            unitPrice: { amount: element.unitPrice.amount } 
+          let orders = [];
+          order.documentLines.forEach(element => {
+            orders.push({
+              salesItem: element.purchasesItem,
+              quantity: element.quantity,
+              unitPrice: { amount: element.unitPrice.amount }
+            })
           })
+
+          let doc = {
+            documentType: "ECL",
+            serie: 2020,
+            documentDate: "2020-12-31T12:17:53.534Z",
+            buyerCustomerParty: "0001",
+            discount: 0,
+            currency: "EUR",
+            paymentMethod: "NUM",
+            company: "SINF",
+            deliveryOnInvoice: false,
+            documentLines: orders
+          }
+
+          fetch("https://my.jasminsoftware.com/api/243035/243035-0001/sales/orders", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token
+            },
+            referrerPolicy: "no-referrer",
+            body: JSON.stringify(doc) // body data type must match "Content-Type" header
+          }).then(function (res) {
+            console.log("done processing");
+            return res.json();
+          }).then(function (json) {
+            console.log("I AM RESPONSE")
+            //add to database!!! and UPDATE STATE TO 2
+            addSaleToDatabase(json, order.id)
+          }).catch(function () {
+            console.log("error");
+          });
+
         })
-
-        let doc ={
-          documentType: "ECL",
-          serie: 2020,
-          documentDate: "2020-12-31T12:17:53.534Z",
-          buyerCustomerParty: "0001",
-          discount: 0,
-          currency: "EUR",
-          paymentMethod: "NUM",
-          company: "SINF",
-          deliveryOnInvoice: false,
-          documentLines: orders
-        }
-
-        fetch("https://my.jasminsoftware.com/api/243035/243035-0001/sales/orders", {
-          method: "POST", 
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + token
-          },
-          referrerPolicy: "no-referrer",
-          body: JSON.stringify(doc) // body data type must match "Content-Type" header
-        }).then(function(res) {
-          console.log("done processing");
-          return res.json();
-        }).then(function(json) {
-          console.log("I AM RESPONSE")
-          //add to database!!! and UPDATE STATE TO 2
-          addSaleToDatabase(json , order.id)
-      }).catch(function() {
-          console.log("error");
-      });
-
-      })
     }
   });
 
-  
+
 
 }
 
-async function addSaleToDatabase(saleOrderID , orderID ){
+async function addSaleToDatabase(saleOrderID, orderID) {
 
   console.log("...... sale order id ........");
   console.log(saleOrderID)
@@ -461,28 +635,28 @@ async function addSaleToDatabase(saleOrderID , orderID ){
               SET sellerId = ? , state = 2
               WHERE id = ?`;
 
-  db.run(sql, data, function(err) {
+  db.run(sql, data, function (err) {
     if (err) {
       return console.error(err.message);
     }
     console.log(`Row(s) updated`);
-    log(orderID,"CREATED_SALES_ORDER");
+    log(orderID, "CREATED_SALES_ORDER");
 
   });
 
 }
 
-async function log(orderID , message){
+async function log(orderID, message) {
 
   console.log("-----order id ........");
   console.log(orderID)
   console.log("-----message  ........");
   console.log(message)
 
-  let data = [orderID, message , new Date().toISOString()];
+  let data = [orderID, message, new Date().toISOString()];
   let sql = `INSERT INTO messages(order_id,message,date) VALUES(?,?,?)`;
 
-  db.run(sql, data, function(err) {
+  db.run(sql, data, function (err) {
     if (err) {
       return console.error(err.message);
     }

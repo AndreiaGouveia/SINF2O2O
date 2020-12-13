@@ -4,8 +4,10 @@ import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import EditCompanies from '../Components/EditCompanies';
+import Spinner from 'react-bootstrap/Spinner';
 
 import './../CSS/Companies.css'
+import '../CSS/Spinner.css';
 
 class Companies extends Component {
 
@@ -44,9 +46,7 @@ class Companies extends Component {
     render () {
         console.log(this.state.data)
         if(this.state.isLoading){
-            return (
-                <h1>I am loading</h1>
-            );
+            return(<div id="Spinner"><Spinner animation="grow" /></div>);
         }
         console.log(this.state.data[0]);
         console.log(this.state.isEditiding)

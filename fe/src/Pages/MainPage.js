@@ -10,11 +10,7 @@ function MainPage() {
         <>
             <div className="banner">
                 <div className="center">
-<<<<<<< HEAD
-                    <h1>Welcome</h1>
-=======
                     <h1>Welcome!</h1>
->>>>>>> inventory-page
                 </div>
 
                 <div className="functionalities">

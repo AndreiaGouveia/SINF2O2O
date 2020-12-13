@@ -58,18 +58,3 @@ nav.nav {
     margin-left: auto;
     margin-right: auto;
 }
-
-#Spinner {
-    margin: auto;
-    height: 640px;
-    text-align: center;
-    position: relative;
-}
-
-#Spinner div {
-    margin: 0;
-    position: absolute;
-    top: 45%;
-    left: 50%;
-    
-}

@@ -3,6 +3,7 @@ import Table from 'react-bootstrap/Table';
 import Row from 'react-bootstrap/Row';
 import Spinner from 'react-bootstrap/Spinner';
 import './../CSS/Inventory.css';
+import '../CSS/Spinner.css';
 
 
 class InventoryComponent_Warehouses extends Component {

@@ -5,6 +5,7 @@ import Tabs from 'react-bootstrap/Tabs';
 import Spinner from 'react-bootstrap/Spinner';
 import Row from 'react-bootstrap/Row';
 import './../CSS/Inventory.css';
+import '../CSS/Spinner.css';
 
 
 

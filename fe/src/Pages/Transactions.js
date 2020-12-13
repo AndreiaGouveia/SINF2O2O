@@ -14,7 +14,9 @@ import Paper from '@material-ui/core/Paper';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import Button from '@material-ui/core/Button';
+import Spinner from 'react-bootstrap/Spinner';
 import "../CSS/Transactions.css";
+import '../CSS/Spinner.css';
 import { Component } from "react";
 
 const useRowStyles = makeStyles({
@@ -122,12 +124,7 @@ class Transactions extends Component {
 
   render() {
     if (this.state.isLoading) {
-      return (
-        <>
-          <h1>I am loading</h1>
-          <h1>{ (new Date()).toISOString}</h1>
-        </>
-      );
+      return(<div id="Spinner"><Spinner animation="grow" /></div>);
     } else {
       console.log(this.state.data)
       return (

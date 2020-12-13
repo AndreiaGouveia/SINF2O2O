@@ -10,11 +10,9 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import Fab from '@material-ui/core/Fab';
 import Paper from '@material-ui/core/Paper';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
 import "../CSS/Transactions.css";
 import { Component } from "react";
@@ -151,10 +149,6 @@ class Transactions extends Component {
               }
             </TableBody>
           </Table>
-
-          <Fab href="CreateOrder" color="primary" aria-label="add">
-            <AddIcon />
-          </Fab>
         </TableContainer>
       );
     }

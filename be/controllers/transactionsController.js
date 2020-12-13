@@ -6,7 +6,6 @@ const token_sinf = "243035-0001/";
 const url = "https://my.jasminsoftware.com/api/";
 const axios = require("axios");
 const db = require("../database/database");
-var format = require('date-format');
 var FormData = require("form-data");
 const fetch = require("node-fetch");
 
@@ -204,98 +203,13 @@ async function getSalesProducts(result, res) {
 
 }
 
-exports.create_company_order = async function createCompanyProducts(req, res, next) {
-  req.params.id = 0;
-
-  if (req.params.id != 0 && req.params.id != 1) {
-    res.status(400).json({ success: false, error: "There needs to be a valid id" });
-    return;
-  }
-
-  let params = [req.params.id];
-  db.all("SELECT * from company where id=$1", params, function (err, rows) {
-    if (err) {
-      res.status(400).json({ success: false, error: "Invalid query" });
-    }
-    else
-      rows.forEach(function (row) {
-        createOrder(row, res);
-      });
-  });
-}
-
-async function createOrder(result, res) {
-  //get token!!
-
-
-  let tenant = tenant_differ;
-  let company = token_differ;
-  let token = result.token;
-
-  var docLines = {
-    purchasesItem: 'CEREALS_CHOCO',
-    quantity: 30,
-    unitPrice: 2
-  };
-
-
-  const bodyParameters = {
-    documentType: 'ECF',
-    company: 'D',
-    sellerSupplierParty: 0001,
-    sellerSupplierParty: 0001,
-    sellerSupplierPartyName: 'SINF',
-    documentDate: "2020-12-12T00:00:00",
-    deliveryTerm: 'Transp',
-    paymentMethod: "TRA",
-    paymentTerm: 01,
-    loadingCountry: 'PT',
-    accountingParty: 0001,
-    documentLines: docLines
-  };
-
-  /*  var result; */
-
-
-
-  const config = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "x-www-form-urlencoded"
-    }
-  };
-
-  try {
-    const response = await axios.post(
-      "https://my.jasminsoftware.com/api/243034/243034-0001/purchases/orders",
-      bodyParameters,
-      config
-    ).then(response => {
-      let data = response.data;
-      res.status(200).json({ result: data });
-    }).catch(error => {
-      //token might have expired or might not even exist so get new token and try again!
-      console.log("An error occured - Will try token createOrder");
-      getToken(result).then(response => {
-        result.token = response;
-        console.log("Got a new token!!");
-        createOrder(result, res);
-      });
-    });
-    return data;
-  } catch (error) {
-    return error;
-  }
-
-}
-
 ////////////////////////////////////////// New Structure ////////////////////////////////////////////
 
 exports.getorders = async function teste() {
   //get database info
   let params = ['purchased'];
 
-  db.all("SELECT id, state from companyOrder where type=$1", params, function (err, rows) {
+  db.all("SELECT id, state, sellerId from companyOrder where type=$1", params, function (err, rows) {
     if (err) {
       console.log("Error: " + err);
     }
@@ -320,9 +234,183 @@ async function handleDatabaseResponse(response, idsList) {
 
 }
 
+
+///////////////////// Invoices ///////////////////////////////////////////
 async function checkStatus(response) {
-  console.log("Checking status");
+
+  let salesOrders = [];
+
+  console.log("----------------------------------------I am inside check status");
+  response.forEach(element => {
+    if (element.state == 2) {
+      salesOrders.push(element.sellerId)
+    }
+
+    //console.log(element);
+  });
+
+  console.log("ORDERS WITH STATUS 2");
+  console.log(salesOrders);
+
+  getInvoices(salesOrders);
 }
+
+
+async function getInvoices(salesOrders) {
+
+  db.all("SELECT * from company where id=1", function (err, rows) {
+    if (err) {
+      console.log("Invalid query");
+      return;//doesnt do anything
+    }
+    else {
+      getAllInvoices(rows[0], salesOrders);
+    }
+  });
+}
+
+
+async function getAllInvoices(companyInfo, salesOrders) {
+  let token = companyInfo.token;
+
+  axios
+    .get(url + tenant_sinf + token_sinf + "billing/invoices", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "x-www-form-urlencoded"
+      }
+    })
+    .then(response => {
+      let data = response.data;
+      compareIdwithInvoice(data, salesOrders);
+    })
+    .catch(error => {
+      //token might have expired or might not even exist so get new token and try again!
+      console.log("will try token");
+      getToken(companyInfo).then(response => {
+        companyInfo.token = response;
+        getAllInvoices(companyInfo, salesOrders);
+      });
+    });
+}
+
+
+
+async function compareIdwithInvoice(data, salesOrders) {
+  console.log("im check invoices");
+
+
+  //addOrderToSeller(jasminOrders[0])
+
+  data.forEach(element => {
+    if (salesOrders.includes(element.sourceDocId)) {
+      updateState3Db(element.sourceDocId);
+      createInvoice(element);
+    }
+  });
+}
+
+
+
+
+async function createInvoice(invoice) {
+  db.all("SELECT * from company where id=0", function (err, rows) {
+    if (err) {
+      console.log("Invalid query");
+      return;//doesnt do anything
+    }
+    else {
+      //console.log(rows)
+      getToken(rows[0])
+        .then(result => {
+
+          let token = result;
+          //console.log(token);
+
+          let orders = [];
+          invoice.documentLines.forEach(element => {
+            orders.push({
+              purchasesItem: element.salesItem,
+              quantity: element.quantity,
+              unitPrice: { amount: element.unitPrice.amount }
+            })
+          })
+
+          let doc = {
+            documentType: "VFA",
+            serie: 2020,
+            documentDate: "2020-12-31T12:17:53.534Z",
+            buyerCustomerParty: "0001",
+            discount: 0,
+            currency: "EUR",
+            paymentMethod: "NUM",
+            company: "SINF",
+            deliveryOnInvoice: false,
+            documentLines: orders
+          }
+
+          fetch("https://my.jasminsoftware.com/api/243034/243034-0001/invoiceReceipt/invoices", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token
+            },
+            referrerPolicy: "no-referrer",
+            body: JSON.stringify(doc) // body data type must match "Content-Type" header
+          }).then(function (res) {
+            console.log("done processing");
+            /* return res.json(); */
+            updateState4Db(invoice.sourceDocId);
+          }).catch(function () {
+            console.log("error");
+          });
+
+        })
+    }
+  });
+
+}
+
+
+async function updateState3Db(orderId){
+  console.log("...... update state 3........");
+
+  let data = [orderId];
+  let sql = `UPDATE companyOrder
+              SET state = 3
+              WHERE id = ?`;
+
+  db.run(sql, data, function (err) {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log(`Row(s) updated`);
+    log(orderID, "CREATING_INVOICE");
+
+  });
+}
+
+
+async function updateState4Db(orderId){
+  console.log("...... update state 4........");
+
+  let data = [orderId];
+  let sql = `UPDATE companyOrder
+              SET state = 4
+              WHERE id = ?`;
+
+  db.run(sql, data, function (err) {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log(`Row(s) updated`);
+    log(orderID, "ORDER_COMPLETED");
+
+  });
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////
 
 async function getOrders(orders, idsList) {
 
@@ -342,7 +430,7 @@ async function getOrdersPurchased(companyInfo, orders, idsList) {
   let token = companyInfo.token;
 
   axios
-    .get(url + tenant_differ + token_differ + "/purchases/orders", {
+    .get(url + tenant_differ + token_differ + "purchases/orders", {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "x-www-form-urlencoded"
@@ -420,7 +508,7 @@ async function addOrderToSeller(order) {
             quantity: element.quantity,
             unitPrice: { amount: element.unitPrice.amount } 
           })
-        })
+        });
 
         let doc ={
           documentType: "ECL",
@@ -436,32 +524,29 @@ async function addOrderToSeller(order) {
         }
 
         fetch("https://my.jasminsoftware.com/api/243035/243035-0001/sales/orders", {
-          method: "POST", 
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + token
-          },
-          referrerPolicy: "no-referrer",
-          body: JSON.stringify(doc) // body data type must match "Content-Type" header
-        }).then(function(res) {
-          return res.json();
-        }).then(function(json) {
-          console.log("Adding sale order to database...")
-          //add to database!!! and UPDATE STATE TO 2
-          addSaleToDatabase(json , order.id)
-      }).catch(function() {
-          console.log("error");
+            method: "POST", 
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token
+            },
+            referrerPolicy: "no-referrer",
+            body: JSON.stringify(doc) // body data type must match "Content-Type" header
+          }).then(function(res) {
+            return res.json();
+          }).then(function(json) {
+            console.log("Adding sale order to database...")
+            //add to database!!! and UPDATE STATE TO 2
+            addSaleToDatabase(json , order.id)
+          }).catch(function() {
+              console.log("error");
+          });
       });
-
-      })
     }
   });
-
-  
-
 }
 
-async function addSaleToDatabase(saleOrderID , orderID ){
+
+async function addSaleToDatabase(saleOrderID, orderID) {
 
   console.log("...... sale order id ........");
   console.log(saleOrderID)
@@ -473,7 +558,7 @@ async function addSaleToDatabase(saleOrderID , orderID ){
               SET sellerId = ? , state = 2
               WHERE id = ?`;
 
-  db.run(sql, data, function(err) {
+  db.run(sql, data, function (err) {
     if (err) {
       return console.error(err.message);
     }
@@ -484,17 +569,17 @@ async function addSaleToDatabase(saleOrderID , orderID ){
 
 }
 
-async function log(orderID , message){
+async function log(orderID, message) {
 
   console.log("-----order id ........");
   console.log(orderID)
   console.log("-----message  ........");
   console.log(message)
 
-  let data = [orderID, message , new Date().toISOString()];
+  let data = [orderID, message, new Date().toISOString()];
   let sql = `INSERT INTO messages(order_id,message,date) VALUES(?,?,?)`;
 
-  db.run(sql, data, function(err) {
+  db.run(sql, data, function (err) {
     if (err) {
       return console.error(err.message);
     }

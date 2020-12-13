@@ -38,6 +38,7 @@ async function getToken(result, res) {
     let params = [data.access_token, result.id];
     db.run("UPDATE company SET token = $1 where id = $2", params, function (err) {
       if (err) {
+        console.log(err);
         res.status(400).json({ success: false, error: "Invalid query" });
       }
       console.log("I have updated")
@@ -50,15 +51,9 @@ async function getToken(result, res) {
 
 
 exports.get_company_purchased_orders = async function getCompanyPurchasedOrders(req, res, next) {
-  req.params.id = 0;
+  console.log("hellloooo");
 
-  if (req.params.id != 0 && req.params.id != 1) {
-    res.status(400).json({ success: false, error: "There needs to be a valid id" });
-    return;
-  }
-
-  let params = [req.params.id];
-  db.all("SELECT * from company where id=$1", params, function (err, rows) {
+  db.all("SELECT * from company where id=0", function (err, rows) {
     if (err) {
       res.status(400).json({ success: false, error: "Invalid query" });
     }
@@ -71,6 +66,7 @@ exports.get_company_purchased_orders = async function getCompanyPurchasedOrders(
 }
 
 async function getPurchasedOrders(result, res) {
+  console.log("IM ON PURCHASED ORDERS");
   console.log(result);
   let tenant = tenant_differ;
   let company = token_differ;
@@ -90,17 +86,42 @@ async function getPurchasedOrders(result, res) {
       }
     })
     .then(response => {
-      let data = response.data;
-      res.status(200).json({ result: data });
+
+      console.log("dataaaaaaaaaaa");
+      getOrdersBD(res,response.data);
     })
     .catch(error => {
       //token might have expired or might not even exist so get new token and try again!
-      console.log("will try token");
+      console.log("will try token getPurchasedOrders");
       getToken(result).then(response => {
         result.token = response;
         getPurchasedOrders(result, res);
       });
     });
+}
+
+async function getOrdersBD(res, data){
+  db.all("select order_id, message, date from messages order by order_id", function (err, rows) {
+    if (err) {
+      res.status(400).json({ success: false, error: "Invalid query" });
+    }
+    else{
+      let responseData = [];
+      rows.forEach(function (row) {
+        let index = data.findIndex(dat => dat.id === row.order_id);
+        if(index!=-1){
+          if(data[index].documentTypeDescription === "Encomenda a fornecedor")
+          responseData.push({...{message : row.message , date : row.date}, ...{
+                    date1 : data[index].createdOn.substring(0,19).replace("T"," "),
+                    order: data[index].documentLines[0].quantity + 'x ' + data[index].documentLines[0].description,
+                    supplier : data[index].sellerSupplierPartyName,
+                    value : data[index].payableAmount.amount + ' ' + data[index].payableAmount.symbol
+                }});
+        }
+      });
+      res.status(200).json({ result: responseData });
+    }
+  });
 }
 
 
@@ -148,9 +169,9 @@ async function getSalesProducts(result, res) {
       res.status(200).json({ result: data });
     })
     .catch(error => {
-      //console.log(error);
+      console.log(error);
       //token might have expired or might not even exist so get new token and try again!
-      console.log("will try token");
+      console.log("will try token getSalesProducts");
       getToken(result).then(response => {
         result.token = response;
         getSalesProducts(result, res);
@@ -234,7 +255,7 @@ async function createOrder(result, res) {
     }).catch(error => {
       //console.log(error);
       //token might have expired or might not even exist so get new token and try again!
-      console.log("will try token");
+      console.log("will try token createOrder");
       getToken(result).then(response => {
         result.token = response;
         console.log(result.token);
@@ -277,8 +298,6 @@ exports.getorders = async function teste() {
 
 async function handleDatabaseResponse(response, idsList) {
   //o get orders e o check status of orders can be done simulaniously!
-  console.log("im got reply")
-  console.log(response);
 
   //getOrders();
   getOrders(response, idsList);
@@ -286,20 +305,10 @@ async function handleDatabaseResponse(response, idsList) {
   //checking status of our orders
   checkStatus(response);
 
-  //compareOrdes
-
-  //-> if new 
-  // insert new orders(database) and create new sale order in jasmin (sinf) -- ter em conta que já pode estar tratado
-
-  // check status of each order!
-  //have a handler to see which status and ask jasmin the respective solution and alter the status  
 }
 
 async function checkStatus(response) {
   console.log("I am inside check status");
-  response.forEach(element => {
-    console.log(element);
-  });
 }
 
 async function getOrders(orders, idsList) {
@@ -332,7 +341,7 @@ async function getOrdersPurchased(companyInfo, orders, idsList) {
     })
     .catch(error => {
       //token might have expired or might not even exist so get new token and try again!
-      console.log("will try token");
+      console.log("will try token getOrdersPurchased");
       getToken(companyInfo).then(response => {
         companyInfo.token = response;
         getOrdersPurchased(companyInfo, orders, idsList);

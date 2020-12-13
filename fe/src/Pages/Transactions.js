@@ -28,6 +28,10 @@ const useRowStyles = makeStyles({
 });
 
 function createData(date, order, supplier, value) {
+  console.log(date)
+  console.log(order)
+  console.log(supplier)
+  console.log(value)
   return {
     date, order, supplier, value,
     status: [
@@ -153,14 +157,11 @@ class Transactions extends Component {
               </TableRow>
             </TableHead>
             <TableBody>
-              {this.state.data.filter(aux => aux.documentTypeDescription == "Encomenda a fornecedor").map((orders) => {
-                var date = orders.createdOn.substring(0,19).replace("T"," ");
-                var order = orders.documentLines[0].quantity + 'x ' + orders.documentLines[0].description;
-                var supplier = orders.sellerSupplierPartyName;
-                var value = orders.payableAmount.amount + ' ' + orders.payableAmount.symbol;
-                /* console.log(date, order, supplier, value); */
-                return <Row row={createData(date, order, supplier, value)} />;
-              })}
+              {
+                this.state.data.map(element => (<Row row={createData(element.date1, element.order, element.supplier, element.value)} />))
+                  
+                
+              }
             </TableBody>
           </Table>
 

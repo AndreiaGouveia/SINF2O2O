@@ -73,11 +73,11 @@ class InventoryComponent_Entities extends Component {
                     <select name="companies" id="companies" onChange={this.changeCompany.bind(this)}>
                             {(() => {
                                 if(this.state.company === 0) {
-                                    return (<><option value="c1">C1</option>
-                                            <option value="c2">C2</option></>);
+                                    return (<><option value="c1">DIFFER</option>
+                                            <option value="c2">SINFD</option></>);
                                 } else {
-                                    return (<><option value="c1">C1</option>
-                                            <option value="c2" selected="selected">C2</option></>);
+                                    return (<><option value="c1">DIFFER</option>
+                                            <option value="c2" selected="selected">SINFD</option></>);
                                 }
                             })()}
                         </select>

@@ -20,7 +20,7 @@ function MainPage() {
                     </div>
                     <div className="func">
                         <VscSettingsGear />
-                        <h2>Manage Your Products</h2>
+                        <h2>Manage Your Inventory</h2>
                     </div>
                     <div className="func">
                         <IoSyncSharp />

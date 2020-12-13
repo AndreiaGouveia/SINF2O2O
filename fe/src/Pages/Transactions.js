@@ -158,9 +158,7 @@ class Transactions extends Component {
             </TableHead>
             <TableBody>
               {
-                this.state.data.map(element => (<Row row={createData(element.date1, element.order, element.supplier, element.value)} />))
-                  
-                
+                this.state.data.map(element => (<Row row={createData(element.date1, element.order, element.supplier, element.value)} />)) 
               }
             </TableBody>
           </Table>

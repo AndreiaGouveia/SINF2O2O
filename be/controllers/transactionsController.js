@@ -338,8 +338,8 @@ async function createInvoice(invoice) {
 
           let doc = {
             documentType: "VFA",
-            serie: 2020,
-            documentDate: "2020-12-31T12:17:53.534Z",
+            serie: "FIX",
+            documentDate: new Date().toISOString(),
             buyerCustomerParty: "0001",
             discount: 0,
             currency: "EUR",
@@ -460,10 +460,13 @@ async function compareOrders(jasminOrders, orders, idsLists) {
     if (idsLists.includes(element.id)) {
     }
     else {
-      //temos de adicionar salesorders na sinf() e adicionar essa salesorder na bd.
-      console.log("Inserting new element...");
-      insertNewOrderToDB(element.id);
-      addOrderToSeller(element);
+      //VER SE A ORDER  
+      if(element.serie === "FIX" && element.sellerSupplierParty === "0001"){
+        console.log("I AM A CORRECT ORDER");
+        console.log("Inserting new element...");
+        insertNewOrderToDB(element.id);
+        addOrderToSeller(element);
+      }
     }
   });
 
@@ -512,8 +515,8 @@ async function addOrderToSeller(order) {
 
         let doc ={
           documentType: "ECL",
-          serie: 2020,
-          documentDate: "2020-12-31T12:17:53.534Z",
+          serie: "FIX",
+          documentDate:new Date().toISOString(),
           buyerCustomerParty: "0001",
           discount: 0,
           currency: "EUR",

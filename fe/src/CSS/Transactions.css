@@ -83,3 +83,7 @@ a:hover {
     margin-top: 150px!important;
     margin-bottom: 200px !important;
 }
+
+.MuiTable-root{
+    margin-bottom: 3rem!important;
+}

@@ -48,7 +48,13 @@ function Row(props) {
           </IconButton>
         </TableCell>
         <TableCell id="date-col" align="left">{row.date}</TableCell>
-        <TableCell id="order-col" align="left">{row.order}</TableCell>
+        <TableCell id="order-col" align="left">
+          <ul>
+            {
+              row.order.map(element => (<li>{element}</li> ))
+            }
+          </ul>
+        </TableCell>
         <TableCell id="supplier-col" align="center">{row.supplier}</TableCell>
         <TableCell id="min-col" align="center">{row.value}</TableCell>
       </TableRow>

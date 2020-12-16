@@ -133,13 +133,18 @@ async function getOrdersBD(res, data){
         let index = data.findIndex(dat => dat.id === tempData[i].order);
         if(index!=-1){
             //new 
-            if(data[index].documentTypeDescription === "Encomenda a fornecedor" && index != -1)
+            if(data[index].documentTypeDescription === "Encomenda a fornecedor" && index != -1){
+              let orders = [];
+              data[index].documentLines.forEach(order => {
+                  orders.push(order.quantity + 'x ' + order.description);
+              });
               responseData.push({...{messages: tempData[i].logs}, ...{
                 date1 : data[index].createdOn.substring(0,19).replace("T"," "),
-                order: data[index].documentLines[0].quantity + 'x ' + data[index].documentLines[0].description,
+                order: orders,
                 supplier : data[index].sellerSupplierPartyName,
                 value : data[index].payableAmount.amount + ' ' + data[index].payableAmount.symbol
               }});  
+            }
         }
       }
       res.status(200).json({ result: responseData });
@@ -306,18 +311,14 @@ async function compareIdwithInvoice(data, salesOrders) {
 
   data.forEach(element => {
     console.log("invoice element thing " + element.documentLines[0].sourceDocId );
-
-    console.log(salesOrders);
-    element.documentLines.forEach( order => {
-      console.log(order.sourceDocId );
-      let index =salesOrders.findIndex(sale => sale.sellerId === order.sourceDocId);
+      console.log(element.documentLines[0].sourceDocId );
+      let index =salesOrders.findIndex(sale => sale.sellerId === element.documentLines[0].sourceDocId);
       console.log(index);
       if (index!=-1) {
         updateState3Db(salesOrders[index].id);
         createInvoice(element, salesOrders[index].id);
       }
     });
-  });
 }
 
 

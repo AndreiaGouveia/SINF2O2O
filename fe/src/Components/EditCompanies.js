@@ -5,9 +5,7 @@ import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 
 import './../CSS/Companies.css';
-
-const companyController = require('../controllers/companiesController');
-const db = require("../database/database");
+import axios from 'axios';
 
 async function SaveChanges(old_info) {
 
@@ -31,22 +29,23 @@ async function updateCompanyInfo(companyID, old_info) {
 
     let company = [];
     let new_info = document.querySelectorAll("#Company" + (companyID + 1) + " input");
+    console.log(new_info);
     new_info.forEach(input => {
+        console.log("input1 " + input.value);
         company.push(input.value);
     });
     console.log(company);
 
-    let changes_made = false;
+    let no_changes_made = true;
 
     // Check if input info is new
     company.forEach(input => {
-        if (input.value != old_info.input) {
-            changes_made = true;
-            break;
-        }
+        console.log("input2 " + input.value);
+        console.log("old " + old_info.input);
+        no_changes_made &= (input.value !== old_info.input);
     });
 
-    if (changes_made) {
+    if (!no_changes_made) {
 
         // Send request to be to update the db
         try {

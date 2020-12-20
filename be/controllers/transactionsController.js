@@ -210,7 +210,7 @@ async function getSalesProducts(result, res) {
 
 ////////////////////////////////////////// New Structure ////////////////////////////////////////////
 
-exports.getorders = async function teste() {
+exports.getorders = async function listener() {
   //get database info
   let params = ['purchased'];
 
@@ -293,11 +293,11 @@ async function getAllInvoices(companyInfo, salesOrders) {
     .catch(error => {
       //token might have expired or might not even exist so get new token and try again!
       console.log(error);
-      /*console.log("An Error has occured: Will try token");
+      console.log("An Error has occured: Will try token");
       getToken(companyInfo).then(response => {
         companyInfo.token = response;
         getAllInvoices(companyInfo, salesOrders);
-      });*/
+      });
     });
 }
 
@@ -310,11 +310,9 @@ async function compareIdwithInvoice(data, salesOrders) {
   //addOrderToSeller(jasminOrders[0])
 
   data.forEach(element => {
-    console.log("invoice element thing " + element.documentLines[0].sourceDocId );
-      console.log(element.documentLines[0].sourceDocId );
       let index =salesOrders.findIndex(sale => sale.sellerId === element.documentLines[0].sourceDocId);
-      console.log(index);
       if (index!=-1) {
+        console.log("Found new invoice!")
         updateState3Db(salesOrders[index].id);
         createInvoice(element, salesOrders[index].id);
       }

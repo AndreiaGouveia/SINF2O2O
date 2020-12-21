@@ -164,14 +164,16 @@ async function getPurchasedProducts(result,res){
 
 }
 
-exports.update_companies_info = async function update_companies_info(id, company) {
+exports.update_companies_info = async function update_companies_info(id, new_info) {
 
-  // Get new token with new company info
-  let token = getToken(company);
+  console.log("Got here!");
+
+  // Get new token with new info
+  let token = getToken(new_info);
   if (token instanceof Error) console.log(token);
 
-  // Post to db updating company info once new token is received
-  company.forEach(input => {
+  // Post to db updating new_info info once new token is received
+  new_info.forEach(input => {
       let params = [input, input.value, id];
       db.run("UPDATE company SET $1 = $2 where id = $3", params, function(err){
           if(err){
